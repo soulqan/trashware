@@ -5,7 +5,6 @@ import StatCard from '@/components/dashboard/StatCard';
 import { FiTrash2, FiCheckCircle, FiAlertTriangle, FiXCircle, FiWifiOff } from 'react-icons/fi';
 
 export default function DashboardView() {
-  // State untuk menyimpan data dari Firebase
   const [bins, setBins] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [prevCounts, setPrevCounts] = useState<any>({});
@@ -31,18 +30,16 @@ export default function DashboardView() {
     });
 
     return () => unsubscribe();
-  }); // Re-run saat jumlah bin berubah untuk update trend
+  }); 
 
-  // Fungsi pembantu untuk menghitung angka statistik
   const stats = {
     total: bins.length,
     empty: bins.filter(bin => bin.capacity < 20).length,
     nearlyFull: bins.filter(bin => bin.capacity >= 70 && bin.capacity < 90).length,
     full: bins.filter(bin => bin.capacity >= 90).length,
-    offline: bins.filter(bin => bin.isOffline).length, // Asumsi ada field isOffline
+    offline: bins.filter(bin => bin.isOffline).length, 
   };
 
-  // Fungsi untuk menampilkan text trend (+1, -1, atau 0)
   const getTrend = (current: number, previous: number) => {
     const diff = current - previous;
     if (diff > 0) return `+${diff}`;
