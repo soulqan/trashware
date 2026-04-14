@@ -5,14 +5,27 @@ import StatCard from '@/components/dashboard/StatCard';
 import BinCard from '@/components/dashboard/BinCard';
 import { FiTrash2, FiCheckCircle, FiAlertTriangle, FiXCircle, FiWifiOff } from 'react-icons/fi';
 
+interface Bin {
+  id: string;
+  location: string;
+  building?: string;
+  capacity: number;
+  status?: string;
+  isOffline?: boolean;
+}
+
 export default function DashboardView() {
-  const [bins, setBins] = useState<any[]>([]);
+  const [bins, setBins] = useState<Bin[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const q = query(collection(db, "bins"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const binsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const binsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Bin[];
+
       setBins(binsData);
       setLoading(false);
     });
@@ -21,10 +34,10 @@ export default function DashboardView() {
 
   const stats = {
     total: bins.length,
-    empty: bins.filter(b => b.status === 'on' && b.capacity == 0).length,
-    nearlyFull: bins.filter(b => b.status === 'on' && b.capacity >= 70 && b.capacity < 90).length,
-    full: bins.filter(b => b.status === 'on' && b.capacity >= 90).length,
-    offline: bins.filter(b => b.status === 'off').length,
+    empty: bins.filter(b => b.capacity < 20).length,
+    nearlyFull: bins.filter(b => b.capacity >= 70 && b.capacity < 90).length,
+    full: bins.filter(b => b.capacity >= 90).length,
+    offline: bins.filter(b => b.isOffline).length,
   };
 
   if (loading) return <div className="p-10 text-center text-emerald-500 font-bold">Menghubungkan ke Sistem...</div>;
@@ -66,7 +79,7 @@ export default function DashboardView() {
               location={bin.location}
               building={bin.building || bin.location.split(' - ')[0]}
               capacity={bin.capacity}
-              status={bin.status}
+              status={bin.isOffline ? 'off' : 'on'}
             />
           ))}
         </div>

@@ -1,6 +1,25 @@
 import { FiSearch, FiBell, FiMoon } from 'react-icons/fi';
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import { deriveNotificationService } from '@/lib/services/deriveNotificationService';
 
 export default function Navbar() {
+  const router = useRouter();
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  // Subscribe to notification counts
+  useEffect(() => {
+    const unsubscribe = deriveNotificationService.subscribeToNotificationCounts((counts) => {
+      setNotificationCount(counts.baru); // Show only unread count
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleBellClick = () => {
+    router.push('/notifications');
+  };
+
   return (
     <header className="h-20 bg-transparent flex items-center justify-between px-8">
       {/* Search Bar */}
@@ -19,10 +38,14 @@ export default function Navbar() {
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-4 text-gray-500">
           <button className="hover:text-emerald-500 transition-colors"><FiMoon size={20}/></button>
-          <div className="relative">
-            <FiBell size={20} className="hover:text-emerald-500 cursor-pointer transition-colors"/>
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-[#F9FAFB]">7</span>
-          </div>
+          <button onClick={handleBellClick} className="relative hover:text-emerald-500 cursor-pointer transition-colors group">
+            <FiBell size={20}/>
+            {notificationCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-[#F9FAFB] font-bold group-hover:bg-red-600 transition-colors">
+                {notificationCount > 9 ? '9+' : notificationCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* User Profile */}
