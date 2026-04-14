@@ -43,13 +43,12 @@ const filteredBins = bins.filter((bin) => {
 
   return (
     
-    <div className="p-8 space-y-8 bg-[#F8FAFC] min-h-screen">
+    <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-black text-gray-800">Dashboard</h1>
         <p className="text-sm text-gray-400">Pantau ringkasan status tempat sampah secara real-time.</p>
       </div>
-
       {/* 1. StatCard */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <StatCard title="Total Bin" value={stats.total} textColor="text-gray-800" icon={<FiTrash2/>} />

@@ -2,46 +2,54 @@ import { FiSearch, FiBell, FiMoon } from 'react-icons/fi';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { deriveNotificationService } from '@/lib/services/deriveNotificationService';
-import { useSearch } from '@/context/SearchContext'; 
+import { useSearch } from '@/context/SearchContext';
 
 export default function Navbar() {
   const router = useRouter();
   const [notificationCount, setNotificationCount] = useState(0);
-  
-  // 2. Gunakan Context Search
   const { searchQuery, setSearchQuery } = useSearch();
 
-  // Subscribe to notification counts
-  useEffect(() => {
-    const unsubscribe = deriveNotificationService.subscribeToNotificationCounts((counts) => {
-      setNotificationCount(counts.baru); 
-    });
-
-    return () => unsubscribe();
-  }, []);
+  // 1. Tentukan halaman mana yang SEARCH-nya mau DIHILANGKAN
+  const hideSearchOn = ['/notifications', '/settings', '/profile', '/analytics'];
+  const shouldHideSearch = hideSearchOn.includes(router.pathname);
 
   const handleBellClick = () => {
     router.push('/notifications');
   };
 
+  useEffect(() => {
+    const unsubscribe = deriveNotificationService.subscribeToNotificationCounts((counts) => {
+      setNotificationCount(counts.baru);
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <header className="h-20 bg-transparent flex items-center justify-between px-8">
-      {/* Search Bar */}
+      {/* Search Bar Group */}
       <div className="relative w-96">
-        <span className="absolute inset-y-0 left-4 flex items-center text-gray-400">
-          <FiSearch />
-        </span>
-        <input 
-          type="text" 
-          placeholder="Search bins, locations..." 
-          // 3. Hubungkan ke state global
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-white border-none shadow-soft rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-emerald-500 transition-all outline-none"
-        />
+        {/* 2. Gunakan Conditional Rendering */}
+        {!shouldHideSearch ? (
+          <>
+            <span className="absolute inset-y-0 left-4 flex items-center text-gray-400">
+              <FiSearch />
+            </span>
+            <input 
+              type="text" 
+              placeholder="Search bins, locations..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border-none shadow-soft rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-emerald-500 transition-all outline-none"
+            />
+          </>
+        ) : (
+          /* Bisa dikosongkan atau ganti jadi Breadcrumb/Judul Kecil */
+          <div className="h-10"></div> 
+        )}
       </div>
 
-      {/* Right Side Icons & Profile */}
+      {/* Sisi Kanan (Bell, Profile, dll) tetap muncul di semua page */}
+     {/* Right Side Icons & Profile */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-4 text-gray-500">
           <button className="hover:text-emerald-500 transition-colors">
