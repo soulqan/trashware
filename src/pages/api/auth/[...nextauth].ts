@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import bcrypt from "bcryptjs";
+import GoogleProvider from "next-auth/providers/google";
 // const bcrypt = require("bcryptjs");
 
 // interface UserData {
@@ -62,6 +63,10 @@ export default NextAuth({
         }
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
   ],
 
   pages: {
@@ -73,10 +78,16 @@ export default NextAuth({
   },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.user = user;
       }
+
+      if (account?.provider === "google") {
+        token.provider = "google";
+        token.googleAccessToken = account.access_token;
+      }
+
       return token;
     },
 

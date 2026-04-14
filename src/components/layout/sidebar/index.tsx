@@ -6,11 +6,6 @@ import { FiLogOut } from "react-icons/fi";
 const menuItems = [
   { name: "Dashboard", icon: <FiGrid />, path: "/" },
   { name: "Monitoring", icon: <FiTrash2 />, path: "/monitoring" },
-  { name: "Map View", icon: <FiMapPin />, path: "/map-view" },
-  { name: "Analytics", icon: <FiBarChart2 />, path: "/analytics" },
-  { name: "Notifications", icon: <FiBell />, path: "/notifications" },
-  { name: "Dashboard", icon: <FiGrid />, path: "/" },
-  { name: "Monitoring", icon: <FiTrash2 />, path: "/monitoring" },
   { name: "Manage Bin", icon: <FiMapPin />, path: "/manage" },
   { name: "Analytics", icon: <FiBarChart2 />, path: "/analytics" },
   { name: "Notifications", icon: <FiBell />, path: "/notifications" },
