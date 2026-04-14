@@ -3,29 +3,31 @@ import type { AppProps } from "next/app";
 import Sidebar from "@/components/layout/sidebar";
 import Navbar from "@/components/layout/navbar";
 import { useRouter } from "next/router";
+import { SessionProvider } from "next-auth/react";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   const disableLayout = ["/auth/login", "/auth/register"];
-
   const isDisable = disableLayout.includes(router.pathname);
 
-  // kalau di login / register, tanpa layout
-  if (isDisable) {
-    return <Component {...pageProps} />;
-  }
-
-  // selain itu → pakai layout
   return (
-    <div className="flex min-h-screen bg-[#F9FAFB]">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Navbar />
-        <main className="px-8 py-8 flex-1">
-          <Component {...pageProps} />
-        </main>
-      </div>
-    </div>
+    <SessionProvider session={pageProps.session}>
+      {isDisable ? (
+        // tanpa layout (login/register)
+        <Component {...pageProps} />
+      ) : (
+        // pakai layout
+        <div className="flex min-h-screen">
+          <Sidebar />
+          <div className="flex-1 flex flex-col">
+            <Navbar />
+            <main className="px-8 pb-8">
+              <Component {...pageProps} />
+            </main>
+          </div>
+        </div>
+      )}
+    </SessionProvider>
   );
 }
