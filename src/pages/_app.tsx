@@ -18,11 +18,11 @@ export default function App({ Component, pageProps }: AppProps) {
 
   // selain itu → pakai layout
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-[#F9FAFB]">
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Navbar />
-        <main className="px-8 pb-8">
+        <main className="px-8 py-8 flex-1">
           <Component {...pageProps} />
         </main>
       </div>
