@@ -6,15 +6,28 @@ import StatCard from '@/components/dashboard/StatCard';
 import BinCard from '@/components/dashboard/BinCard';
 import { FiTrash2, FiCheckCircle, FiAlertTriangle, FiXCircle, FiWifiOff } from 'react-icons/fi';
 
+interface Bin {
+  id: string;
+  location: string;
+  building?: string;
+  capacity: number;
+  status?: string;
+  isOffline?: boolean;
+}
+
 export default function DashboardView() {
-  const [bins, setBins] = useState<any[]>([]);
+  const [bins, setBins] = useState<Bin[]>([]);
   const [loading, setLoading] = useState(true);
   const { searchQuery } = useSearch();
 
   useEffect(() => {
     const q = query(collection(db, "bins"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const binsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const binsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Bin[];
+
       setBins(binsData);
       setLoading(false);
     });
