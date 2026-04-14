@@ -86,7 +86,7 @@ export default function DashboardView() {
       </div>
 
       {/* Table Section - Otomatis menampilkan data dari DB */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-50 flex justify-between">
             <p className="font-bold text-gray-700">Real-time Bin Status</p>
             <span className="text-xs text-green-500">Live data</span>
@@ -123,7 +123,7 @@ export default function DashboardView() {
             ))}
           </tbody>
         </table>
-      </div>
+      </div> */}
     </div>
   );
 }
