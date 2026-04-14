@@ -3,33 +3,31 @@ import type { AppProps } from "next/app";
 import Sidebar from "@/components/layout/sidebar";
 import Navbar from "@/components/layout/navbar";
 import { useRouter } from "next/router";
-import { SearchProvider } from "@/context/SearchContext";
+import { SessionProvider } from "next-auth/react";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  
-  // Jika di halaman login, jangan tampilkan Sidebar & Navbar
-  const isLoginPage = router.pathname === "/login";
 
-  if (isLoginPage) {
-    return (
-      <SearchProvider> 
-        <Component {...pageProps} />
-      </SearchProvider>
-    );
-  }
+  const disableLayout = ["/auth/login", "/auth/register"];
+  const isDisable = disableLayout.includes(router.pathname);
 
   return (
-    <SearchProvider> 
-      <div className="flex min-h-screen bg-[#F8FAFC]">
-        <Sidebar />
-        <div className="flex-1 flex flex-col">
-          <Navbar />
-          <main className="px-8 pb-8">
-            <Component {...pageProps} />
-          </main>
+    <SessionProvider session={pageProps.session}>
+      {isDisable ? (
+        // tanpa layout (login/register)
+        <Component {...pageProps} />
+      ) : (
+        // pakai layout
+        <div className="flex min-h-screen">
+          <Sidebar />
+          <div className="flex-1 flex flex-col">
+            <Navbar />
+            <main className="px-8 pb-8">
+              <Component {...pageProps} />
+            </main>
+          </div>
         </div>
-      </div>
-    </SearchProvider>
+      )}
+    </SessionProvider>
   );
 }
