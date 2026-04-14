@@ -5,7 +5,7 @@ export default function ManagePage() {
   return (
     <>
       <Head>
-        <title>Manage Bin | Trashware</title>
+        <title>Manage Bin | Trashware Monitoring</title>
       </Head>
       <ManageView />
     </>
