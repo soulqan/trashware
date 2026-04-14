@@ -41,7 +41,7 @@ export default function RegisterPage() {
           <div className="bg-white p-8 sm:p-10 rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50">
             <div className="mb-8">
               <h2 className="text-xl font-bold text-slate-900 mb-2">Register</h2>
-              <p className="text-slate-500 text-sm">Masuk ke sistem monitoring Trashware</p>
+              <p className="text-slate-500 text-sm">Daftar ke sistem monitoring Trashware</p>
             </div>
 
             <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
@@ -77,18 +77,18 @@ export default function RegisterPage() {
 
               {/* Tombol Submit */}
               <button type="submit" className="w-full bg-[#22c55e] hover:bg-[#16a34a] text-white font-medium py-3 rounded-xl transition-colors mt-2">
-                Masuk
+                Register
               </button>
             </form>
 
             {/* Info Demo Account */}
-            <div className="mt-8 pt-6 border-t border-slate-100">
-              <p className="text-sm text-slate-500 mb-2 font-medium">Demo accounts:</p>
-              <div className="text-xs text-slate-400 space-y-1">
-                <p>Admin: admin@trashware.id / password</p>
-                <p>Petugas: petugas@trashware.id / password</p>
-              </div>
-            </div>
+            {/* <div className="mt-8 pt-6 border-t border-slate-100">
+                <p className="text-sm text-slate-500 mb-2 font-medium">Demo accounts:</p>
+                <div className="text-xs text-slate-400 space-y-1">
+                  <p>Admin: admin@trashware.id / password</p>
+                  <p>Petugas: petugas@trashware.id / password</p>
+                </div>
+              </div> */}
           </div>
         </div>
       </div>

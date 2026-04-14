@@ -6,14 +6,17 @@ import { useRouter } from "next/router";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  
-  // Jika di halaman login, jangan tampilkan Sidebar & Navbar
-  const isLoginPage = router.pathname === "/login";
 
-  if (isLoginPage) {
+  const disableLayout = ["/auth/login", "/auth/register"];
+
+  const isDisable = disableLayout.includes(router.pathname);
+
+  // kalau di login / register, tanpa layout
+  if (isDisable) {
     return <Component {...pageProps} />;
   }
 
+  // selain itu → pakai layout
   return (
     <div className="flex min-h-screen">
       <Sidebar />

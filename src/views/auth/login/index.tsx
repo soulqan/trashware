@@ -1,7 +1,17 @@
 import React from "react";
 // import { Leaf } from 'lucide-react';
+import { useRouter } from "next/router";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // simulasi login berhasil
+    router.push("/");
+  };
+
   return (
     <div className="min-h-screen bg-[#f2f7f9] flex items-center justify-center p-6 relative font-sans text-slate-800">
       {/* Container Utama */}
@@ -44,7 +54,7 @@ export default function LoginPage() {
               <p className="text-slate-500 text-sm">Masuk ke sistem monitoring Trashware</p>
             </div>
 
-            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-5" onSubmit={handleLogin}>
               {/* Input Email */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
@@ -82,13 +92,13 @@ export default function LoginPage() {
             </form>
 
             {/* Info Demo Account */}
-            <div className="mt-8 pt-6 border-t border-slate-100">
+            {/* <div className="mt-8 pt-6 border-t border-slate-100">
               <p className="text-sm text-slate-500 mb-2 font-medium">Demo accounts:</p>
               <div className="text-xs text-slate-400 space-y-1">
                 <p>Admin: admin@trashware.id / password</p>
                 <p>Petugas: petugas@trashware.id / password</p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
