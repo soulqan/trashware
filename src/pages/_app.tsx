@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import Sidebar from "@/components/layout/sidebar";
 import Navbar from "@/components/layout/navbar";
 import { useRouter } from "next/router";
+import { SearchProvider } from "@/context/SearchContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -11,18 +12,24 @@ export default function App({ Component, pageProps }: AppProps) {
   const isLoginPage = router.pathname === "/login";
 
   if (isLoginPage) {
-    return <Component {...pageProps} />;
+    return (
+      <SearchProvider> 
+        <Component {...pageProps} />
+      </SearchProvider>
+    );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#F9FAFB]">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Navbar />
-        <main className="px-8 py-8 flex-1">
-          <Component {...pageProps} />
-        </main>
+    <SearchProvider> 
+      <div className="flex min-h-screen bg-[#F8FAFC]">
+        <Sidebar />
+        <div className="flex-1 flex flex-col">
+          <Navbar />
+          <main className="px-8 pb-8">
+            <Component {...pageProps} />
+          </main>
+        </div>
       </div>
-    </div>
+    </SearchProvider>
   );
 }
