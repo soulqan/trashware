@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import PageContainer from '@/components/layout/PageContainer'; 
+import PageHeader from '@/components/layout/PageHeader'; // Import PageHeader
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { useSearch } from '@/context/SearchContext';
@@ -21,15 +23,15 @@ export default function DashboardView() {
     return () => unsubscribe();
   }, []);
 
-const filteredBins = bins.filter((bin) => {
-  const isFull = bin.status === 'on' && bin.capacity >= 90;
-  const isProblematic = isFull || bin.status === 'off';
+  const filteredBins = bins.filter((bin) => {
+    const isFull = bin.status === 'on' && bin.capacity >= 90;
+    const isProblematic = isFull || bin.status === 'off';
 
-  const searchTarget = `${bin.location} ${bin.id}`.toLowerCase();
-  const matchesSearch = searchTarget.includes(searchQuery.toLowerCase());
+    const searchTarget = `${bin.location} ${bin.id}`.toLowerCase();
+    const matchesSearch = searchTarget.includes(searchQuery.toLowerCase());
 
-  return isProblematic && matchesSearch;
-});
+    return isProblematic && matchesSearch;
+  });
 
   const stats = {
     total: bins.length,
@@ -39,16 +41,22 @@ const filteredBins = bins.filter((bin) => {
     offline: bins.filter(b => b.status === 'off').length,
   };
 
-  if (loading) return <div className="p-20 text-center text-emerald-500 font-bold animate-pulse">Syncing Dashboard...</div>;
+  if (loading) return (
+    <PageContainer>
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-emerald-500 font-bold animate-pulse text-2xl">Syncing Dashboard...</div>
+      </div>
+    </PageContainer>
+  );
 
   return (
-    
-    <div className="space-y-6">
-      {/* Header Section */}
-    <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-black text-gray-800">Dashboard</h1>
-        <p className="text-sm text-gray-400">Pantau ringkasan status tempat sampah secara real-time.</p>
-      </div>
+    <PageContainer>
+      {/* Menggunakan komponen PageHeader untuk judul halaman */}
+      <PageHeader 
+        title="Dashboard" 
+        subtitle="Pantau ringkasan status tempat sampah secara real-time." 
+      />
+
       {/* 1. StatCard */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <StatCard title="Total Bin" value={stats.total} textColor="text-gray-800" icon={<FiTrash2/>} />
@@ -96,6 +104,6 @@ const filteredBins = bins.filter((bin) => {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
