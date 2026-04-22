@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import PageContainer from '@/components/layout/PageContainer'; 
+import PageHeader from '@/components/layout/PageHeader'; // Import PageHeader
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, deleteDoc, doc } from 'firebase/firestore';
 import { useSearch } from '@/context/SearchContext';
@@ -36,15 +38,22 @@ export default function ManageView() {
     return searchTarget.includes(searchQuery.toLowerCase());
   });
 
-  if (loading) return <div className="p-8 text-emerald-500 font-bold animate-pulse text-left">Menghubungkan Database...</div>;
+  if (loading) return (
+    <PageContainer>
+      <div className="text-emerald-500 font-bold animate-pulse text-left">
+        Menghubungkan Database...
+      </div>
+    </PageContainer>
+  );
 
   return (
-    <div className="p-8 space-y-6 min-h-screen font-sans text-left">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-black text-gray-800 tracking-tight">Manage Bin</h1>
-          <p className="text-sm text-gray-400">Monitoring infrastruktur dan status perangkat real-time</p>
-        </div>
+    <PageContainer>
+      {/* Header Section menggunakan PageHeader */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <PageHeader 
+          title="Manage Bin" 
+          subtitle="Monitoring infrastruktur dan status perangkat real-time" 
+        />
         <button 
           onClick={() => { setSelectedBin(null); setModalOpen(true); }} 
           className="flex items-center gap-2 bg-[#00D26A] text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-emerald-50 hover:bg-[#00b95d] transition-all active:scale-95"
@@ -53,10 +62,11 @@ export default function ManageView() {
         </button>
       </div>
 
+      {/* Table Section */}
       <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
-            <thead className="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest font-black">
+            <thead className="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest font-black text-left">
               <tr>
                 <th className="px-6 py-5">ID</th>
                 <th className="px-6 py-5">Nama</th>
@@ -111,10 +121,15 @@ export default function ManageView() {
               })}
             </tbody>
           </table>
+          {filteredBins.length === 0 && (
+            <div className="p-10 text-center text-gray-400 italic">
+              Data bin tidak ditemukan.
+            </div>
+          )}
         </div>
       </div>
       
       <ManageBin isOpen={isModalOpen} onClose={() => setModalOpen(false)} editData={selectedBin} />
-    </div>
+    </PageContainer>
   );
 }

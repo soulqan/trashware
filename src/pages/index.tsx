@@ -18,7 +18,7 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-[#F9FAFB]">
       <div className="flex-1">
-        <main className="p-8">
+        <main>
           <DashboardView />
         </main>
       </div>

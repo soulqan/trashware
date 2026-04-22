@@ -1,5 +1,6 @@
 import { DerivedNotification } from '@/lib/services/deriveNotificationService';
 import NotificationItem from './NotificationItem';
+import PageHeader from '@/components/layout/PageHeader'; // Import PageHeader
 
 interface NotificationFilter {
   semua: number;
@@ -34,14 +35,13 @@ export default function NotificationList({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Bagian Header yang diubah menggunakan PageHeader */}
       <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Notifikasi</h1>
-          <p className="text-gray-500 text-sm mt-1" suppressHydrationWarning>
-            {counts.baru} notifikasi belum dibaca
-          </p>
-        </div>
+        <PageHeader 
+          title="Notifikasi" 
+          subtitle={`${counts.baru} notifikasi belum dibaca`} 
+        />
+        
         <button
           onClick={onMarkAllAsRead}
           disabled={counts.baru === 0}
@@ -52,7 +52,7 @@ export default function NotificationList({
         </button>
       </div>
 
-      {/* Filter Tabs */}
+      {/* Filter Tabs - Tetap sesuai desain asli Anda */}
       <div className="flex gap-3 bg-gray-100 p-2 rounded-2xl w-fit">
         {filterOptions.map((option) => (
           <button
@@ -69,7 +69,7 @@ export default function NotificationList({
         ))}
       </div>
 
-      {/* Notification List */}
+      {/* Notification List Content - Tetap sesuai desain asli Anda */}
       {loading ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
           <p className="text-gray-500">Loading notifikasi...</p>

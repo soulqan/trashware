@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import PageContainer from '@/components/layout/PageContainer'; 
+import PageHeader from '@/components/layout/PageHeader'; // Import PageHeader
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { useSearch } from '@/context/SearchContext';
@@ -16,7 +18,6 @@ export default function MonitoringView() {
   useEffect(() => {
     const q = query(collection(db, "bins"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // Mengambil data dan memastikan ID dari field 'id' Firestore digunakan
       const binsData = snapshot.docs.map(doc => ({ 
         firestoreId: doc.id, 
         ...doc.data() 
@@ -45,18 +46,20 @@ export default function MonitoringView() {
   });
 
   if (loading) return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="text-emerald-500 font-bold animate-bounce">Memuat Data Monitoring...</div>
-    </div>
+    <PageContainer>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-emerald-500 font-bold animate-bounce text-2xl">Memuat Data Monitoring...</div>
+      </div>
+    </PageContainer>
   );
 
   return (
-    <div className="space-y-6">
-      {/* Header Section */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-black text-gray-800">Monitoring Bin</h1>
-        <p className="text-sm text-gray-400">Pantau status seluruh tempat sampah secara real-time.</p>
-      </div>
+    <PageContainer>
+      {/* Header Section menggunakan PageHeader */}
+      <PageHeader 
+        title="Monitoring Bin" 
+        subtitle="Pantau status seluruh tempat sampah secara real-time." 
+      />
 
       {/* Filter Bar */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
@@ -89,11 +92,11 @@ export default function MonitoringView() {
 
       {/* Grid Monitoring */}
       {filteredBins.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBins.map((bin) => (
             <BinCard
               key={bin.firestoreId}
-              id={bin.id} // Menggunakan field 'id' (BIN-006) sebagai judul
+              id={bin.id}
               location={bin.location}
               capacity={bin.capacity}
               status={bin.status}
@@ -105,6 +108,6 @@ export default function MonitoringView() {
           <p className="text-gray-400 italic">Tidak ada tempat sampah yang cocok dengan filter ini.</p>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

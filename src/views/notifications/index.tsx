@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import PageContainer from '@/components/layout/PageContainer'; 
+import PageHeader from '@/components/layout/PageHeader'; // Import PageHeader
 import { DerivedNotification } from '@/lib/services/deriveNotificationService';
 import { deriveNotificationService } from '@/lib/services/deriveNotificationService';
 import { notificationReadService } from '@/lib/services/notificationReadService';
@@ -68,14 +70,17 @@ export default function NotificationsView() {
   };
 
   return (
-    <NotificationList
-      notifications={notifications}
-      filter={filter}
-      counts={counts}
-      onFilterChange={setFilter}
-      onMarkAsRead={handleMarkAsRead}
-      onMarkAllAsRead={handleMarkAllAsRead}
-      loading={loading}
-    />
+    <PageContainer>
+      {/* Header Section menggunakan PageHeader */}
+      <NotificationList
+        notifications={notifications}
+        filter={filter}
+        counts={counts}
+        onFilterChange={setFilter}
+        onMarkAsRead={handleMarkAsRead}
+        onMarkAllAsRead={handleMarkAllAsRead}
+        loading={loading}
+      />
+    </PageContainer>
   );
 }
