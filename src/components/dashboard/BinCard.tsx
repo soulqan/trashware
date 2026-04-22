@@ -2,31 +2,30 @@ import { FiMapPin, FiClock, FiWifi, FiWifiOff } from 'react-icons/fi';
 
 interface BinCardProps {
   id: string;
-  location: string;
-  capacity: number;
+  gedung: string;
+  lantai: string;
+  ruang: string;
+  level: number;     // Persentase (0-100)
+  capacity: number;  // Total volume (misal: 100)
   status: 'on' | 'off';
 }
 
-export default function BinCard({ id, location, capacity, status }: BinCardProps) {
+export default function BinCard({ id, gedung, lantai, ruang, level, capacity, status }: BinCardProps) {
   const isOnline = status === 'on';
   
   const getTheme = () => {
     if (!isOnline) {
       return { color: 'bg-gray-300', text: 'text-gray-500', label: 'Offline', bgLabel: 'bg-gray-100' };
     }
-
-    if (capacity >= 90) {
+    if (level >= 90) {
       return { color: 'bg-red-500', text: 'text-red-500', label: 'Penuh', bgLabel: 'bg-red-100' };
     }
-
-    if (capacity >= 70) {
+    if (level >= 70) {
       return { color: 'bg-orange-400', text: 'text-orange-500', label: 'Hampir Penuh', bgLabel: 'bg-orange-100' };
     }
-
-    if (capacity > 0) {
+    if (level > 0) {
       return { color: 'bg-emerald-500', text: 'text-emerald-500', label: 'Terisi', bgLabel: 'bg-emerald-100' };
     }
-
     return { color: 'bg-gray-300', text: 'text-gray-400', label: 'Kosong', bgLabel: 'bg-gray-50' };
   };
 
@@ -39,9 +38,12 @@ export default function BinCard({ id, location, capacity, status }: BinCardProps
           <h3 className="text-xl font-black text-gray-800 tracking-tighter uppercase leading-none">
             {id}
           </h3>
-          <div className="flex items-center gap-1 text-gray-400 text-[10px] mt-2 font-medium">
-            <FiMapPin size={10} className="shrink-0" />
-            <span className="truncate max-w-[150px]">{location}</span>
+          <div className="flex items-start gap-1 text-gray-400 text-[10px] mt-2 font-medium">
+            <FiMapPin size={10} className="shrink-0 mt-0.5" />
+            <div className="flex flex-col leading-tight">
+              <span className="truncate max-w-[150px] font-bold text-gray-500">{gedung}</span>
+              <span className="truncate max-w-[150px]">{lantai} - {ruang}</span>
+            </div>
           </div>
         </div>
         
@@ -53,18 +55,27 @@ export default function BinCard({ id, location, capacity, status }: BinCardProps
         </div>
       </div>
 
+      {/* Bagian Progress Bar dengan Label Volume */}
       <div className="space-y-2">
         <div className="flex justify-between items-end">
-          <span className="text-xs text-gray-400 font-medium tracking-tight">Kapasitas</span>
+          <span className="text-xs text-gray-400 font-medium tracking-tight">Level Isi</span>
           <span className={`text-xl font-black ${theme.text}`}>
-            {isOnline ? `${capacity}%` : '--'}
+            {isOnline ? `${level}%` : '--'}
           </span>
         </div>
+        
+        {/* Progress Bar */}
         <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
           <div 
             className={`h-full transition-all duration-1000 ${theme.color}`}
-            style={{ width: `${isOnline ? (capacity > 100 ? 100 : capacity < 0 ? 0 : capacity) : 0}%` }}
+            style={{ width: `${isOnline ? (level > 100 ? 100 : level < 0 ? 0 : level) : 0}%` }}
           />
+        </div>
+
+        {/* Label Volume di bawah Bar */}
+        <div className="flex justify-between text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+          <span>0L</span>
+          <span>{capacity ? `${capacity}L` : '-- L'}</span>
         </div>
       </div>
 
