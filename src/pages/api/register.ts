@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // 🔍 cek email sudah ada
+    // cek email sudah ada
     const q = query(collection(db, "users"), where("email", "==", email));
     const snapshot = await getDocs(q);
 
@@ -24,10 +24,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: "Email sudah digunakan" });
     }
 
-    // 🔐 hash password
+    //  hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 💾 simpan ke Firestore
+    //  simpan ke Firestore
     await addDoc(collection(db, "users"), {
       email,
       fullName,
