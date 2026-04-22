@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PageContainer from '@/components/layout/PageContainer'; 
-import PageHeader from '@/components/layout/PageHeader'; // Import PageHeader
+import PageHeader from '@/components/layout/PageHeader'; 
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { useSearch } from '@/context/SearchContext';
@@ -10,9 +10,8 @@ import { FiFilter, FiInfo } from 'react-icons/fi';
 export default function MonitoringView() {
   const [bins, setBins] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { searchQuery } = useSearch(); // Search dari Navbar
+  const { searchQuery } = useSearch(); 
   
-  // State untuk Dropdown Status
   const [statusFilter, setStatusFilter] = useState("Semua Status");
 
   useEffect(() => {
@@ -30,17 +29,19 @@ export default function MonitoringView() {
 
   // LOGIKA FILTER GABUNGAN (Search + Dropdown)
   const filteredBins = bins.filter((bin) => {
-    // 1. Filter Search (Berdasarkan ID atau Lokasi)
-    const searchTarget = `${bin.location} ${bin.id}`.toLowerCase();
+    // 1. Filter Search (Menggunakan variabel baru: gedung, lantai, ruang)
+    const searchTarget = `${bin.gedung || ''} ${bin.lantai || ''} ${bin.ruang || ''} ${bin.id || ''}`.toLowerCase();
     const matchesSearch = searchTarget.includes(searchQuery.toLowerCase());
 
-    // 2. Filter Dropdown Status
+    // 2. Filter Dropdown Status (Menggunakan variabel 'level')
     let matchesStatus = true;
-    if (statusFilter === "Penuh") matchesStatus = bin.status === 'on' && bin.capacity >= 90;
-    if (statusFilter === "Hampir Penuh") matchesStatus = bin.status === 'on' && bin.capacity >= 70 && bin.capacity < 90;
-    if (statusFilter === "Terisi") matchesStatus = bin.status === 'on' && bin.capacity > 0 && bin.capacity < 70;
-    if (statusFilter === "Kosong") matchesStatus = bin.status === 'on' && bin.capacity <= 0;
-    if (statusFilter === "Offline") matchesStatus = bin.status === 'off';
+    const currentLevel = bin.level ?? 0;
+    
+    if (statusFilter === "Penuh") matchesStatus = bin.status === 'on' && currentLevel >= 90;
+    else if (statusFilter === "Hampir Penuh") matchesStatus = bin.status === 'on' && currentLevel >= 70 && currentLevel < 90;
+    else if (statusFilter === "Terisi") matchesStatus = bin.status === 'on' && currentLevel > 0 && currentLevel < 70;
+    else if (statusFilter === "Kosong") matchesStatus = bin.status === 'on' && currentLevel <= 0;
+    else if (statusFilter === "Offline") matchesStatus = bin.status === 'off';
 
     return matchesSearch && matchesStatus;
   });
@@ -55,7 +56,6 @@ export default function MonitoringView() {
 
   return (
     <PageContainer>
-      {/* Header Section menggunakan PageHeader */}
       <PageHeader 
         title="Monitoring Bin" 
         subtitle="Pantau status seluruh tempat sampah secara real-time." 
@@ -97,9 +97,12 @@ export default function MonitoringView() {
             <BinCard
               key={bin.firestoreId}
               id={bin.id}
-              location={bin.location}
-              capacity={bin.capacity}
+              gedung={bin.gedung}
+              lantai={bin.lantai}
+              ruang={bin.ruang}
+              level={bin.level}
               status={bin.status}
+              capacity={bin.capacity}
             />
           ))}
         </div>

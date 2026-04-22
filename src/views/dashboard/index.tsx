@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PageContainer from '@/components/layout/PageContainer'; 
-import PageHeader from '@/components/layout/PageHeader'; // Import PageHeader
+import PageHeader from '@/components/layout/PageHeader'; 
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { useSearch } from '@/context/SearchContext';
@@ -24,10 +24,13 @@ export default function DashboardView() {
   }, []);
 
   const filteredBins = bins.filter((bin) => {
-    const isFull = bin.status === 'on' && bin.capacity >= 90;
+    // Menggunakan variabel 'level' sesuai DB baru
+    const fillLevel = bin.level ?? 0;
+    const isFull = bin.status === 'on' && fillLevel >= 90;
     const isProblematic = isFull || bin.status === 'off';
 
-    const searchTarget = `${bin.location} ${bin.id}`.toLowerCase();
+    // Update target pencarian agar mencakup gedung, lantai, dan ruang
+    const searchTarget = `${bin.gedung} ${bin.lantai} ${bin.ruang} ${bin.id}`.toLowerCase();
     const matchesSearch = searchTarget.includes(searchQuery.toLowerCase());
 
     return isProblematic && matchesSearch;
@@ -35,9 +38,10 @@ export default function DashboardView() {
 
   const stats = {
     total: bins.length,
-    empty: bins.filter(b => b.status === 'on' && b.capacity < 20).length,
-    nearlyFull: bins.filter(b => b.status === 'on' && b.capacity >= 70 && b.capacity < 90).length,
-    full: bins.filter(b => b.status === 'on' && b.capacity >= 90).length,
+    // Update pengecekan menggunakan b.level
+    empty: bins.filter(b => b.status === 'on' && (b.level ?? 0) < 20).length,
+    nearlyFull: bins.filter(b => b.status === 'on' && (b.level ?? 0) >= 70 && (b.level ?? 0) < 90).length,
+    full: bins.filter(b => b.status === 'on' && (b.level ?? 0) >= 90).length,
     offline: bins.filter(b => b.status === 'off').length,
   };
 
@@ -51,7 +55,6 @@ export default function DashboardView() {
 
   return (
     <PageContainer>
-      {/* Menggunakan komponen PageHeader untuk judul halaman */}
       <PageHeader 
         title="Dashboard" 
         subtitle="Pantau ringkasan status tempat sampah secara real-time." 
@@ -92,13 +95,16 @@ export default function DashboardView() {
               <BinCard
                 key={bin.id}
                 id={bin.id}
-                location={bin.location}
-                capacity={bin.capacity}
+                gedung={bin.gedung}
+                lantai={bin.lantai}
+                ruang={bin.ruang}
+                level={bin.level}
                 status={bin.status}
+                capacity={bin.capacity}
               />
             ))
           ) : (
-            <div className="col-span-full py-20 text-center text-gray-400 italic text-sm">
+            <div className="col-span-full py-20 text-center text-gray-400 italic text-sm border border-dashed border-gray-200 rounded-3xl">
               Data tidak ditemukan...
             </div>
           )}
