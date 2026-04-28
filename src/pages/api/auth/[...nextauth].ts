@@ -1,22 +1,11 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import bcrypt from "bcryptjs";
 import GoogleProvider from "next-auth/providers/google";
-// const bcrypt = require("bcryptjs");
 
-// interface UserData {
-//   name: string;
-//   email: string;
-//   password: string;
-// }
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 
-interface UserData {
-  fullName: string;
-  email: string;
-  password: string;
-}
+import bcrypt from "bcryptjs";
 
 export default NextAuth({
   providers: [
@@ -26,43 +15,40 @@ export default NextAuth({
         email: {},
         password: {},
       },
+
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
-        try {
-          const q = query(collection(db, "users"), where("email", "==", credentials.email));
+        const q = query(
+          collection(db, "users"),
+          where("email", "==", credentials.email)
+        );
 
-          const snapshot = await getDocs(q);
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) return null;
 
-          if (snapshot.empty) {
-            return null;
-          }
+        const docSnap = snapshot.docs[0];
+        const userData = docSnap.data();
 
-          // smbil langsung doc pertama
-          const docSnap = snapshot.docs[0];
+        // ❗ kalau user Google
+        if (!userData.password) return null;
 
-          if (!docSnap) return null;
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          userData.password
+        );
 
-          const userData = docSnap.data() as UserData;
+        if (!isValid) return null;
 
-          // ek password
-          const isValid = await bcrypt.compare(credentials.password, userData.password);
-
-          if (!isValid) return null;
-
-          return {
-            id: docSnap.id,
-            name: userData.fullName,
-            email: userData.email,
-          };
-        } catch (error) {
-          console.log("Login error:", error);
-          return null;
-        }
+        return {
+          id: docSnap.id,
+          name: userData.fullName,
+          email: userData.email,
+          role: userData.role, // ✅ ini penting
+        };
       },
     }),
+
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
@@ -70,7 +56,7 @@ export default NextAuth({
   ],
 
   pages: {
-    signIn: "/auth/login", // pakai halaman login kamu
+    signIn: "/auth/login",
   },
 
   session: {
@@ -78,21 +64,59 @@ export default NextAuth({
   },
 
   callbacks: {
+    // 🔥 simpan user ke token
     async jwt({ token, user, account }) {
       if (user) {
         token.user = user;
       }
 
+      // login Google
       if (account?.provider === "google") {
-        token.provider = "google";
-        token.googleAccessToken = account.access_token;
+        const q = query(
+          collection(db, "users"),
+          where("email", "==", token.email)
+        );
+
+        const snapshot = await getDocs(q);
+
+        let dbUser;
+
+        if (snapshot.empty) {
+          const newUser = await addDoc(collection(db, "users"), {
+            email: token.email,
+            fullName: token.name,
+            password: null,
+            role: "petugas",
+            createdAt: new Date(),
+          });
+
+          dbUser = {
+            id: newUser.id,
+            name: token.name,
+            email: token.email,
+            role: "petugas",
+          };
+        } else {
+          const docSnap = snapshot.docs[0];
+          const data = docSnap.data();
+
+          dbUser = {
+            id: docSnap.id,
+            name: data.fullName,
+            email: data.email,
+            role: data.role,
+          };
+        }
+
+        token.user = dbUser;
       }
 
       return token;
     },
 
+    // 🔥 ambil ke session (simple dulu)
     async session({ session, token }) {
-      session.user = token.user as typeof session.user;
+      session.user = token.user as { id: string; name: string; email: string; role: string };
       return session;
     },
   },

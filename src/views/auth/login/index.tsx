@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
+import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -107,6 +108,18 @@ export default function LoginPage() {
               {/* Tombol Submit */}
               <button type="submit" className="w-full bg-[#22c55e] hover:bg-[#16a34a] text-white font-medium py-3 rounded-xl transition-colors mt-2">
                 Masuk
+              </button>
+
+              {/* Divider */}
+              <div className="flex items-center my-5">
+                <div className="flex-1 h-px bg-slate-200"></div>
+                <span className="px-3 text-xs text-slate-400">atau</span>
+                <div className="flex-1 h-px bg-slate-200"></div>
+              </div>
+
+              <button type="button" onClick={() => signIn("google", { callbackUrl: "/" })} className="w-full flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 py-3 rounded-xl transition">
+                <FcGoogle className="text-xl" />
+                <span className="text-sm font-medium text-slate-700">Masuk dengan Google</span>
               </button>
 
               {/* Link ke Halaman Register */}

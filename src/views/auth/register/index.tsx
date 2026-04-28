@@ -114,7 +114,7 @@ export default function RegisterPage() {
               </button>
 
               {/* Divider */}
-              <div className="flex items-center my-5">
+              <div className="flex items-center my-6">
                 <div className="flex-1 h-px bg-slate-200"></div>
                 <span className="px-3 text-xs text-slate-400">atau</span>
                 <div className="flex-1 h-px bg-slate-200"></div>

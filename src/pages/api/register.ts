@@ -10,6 +10,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { email, password, fullName } = req.body;
 
+  // ❗ paksa role
+  const userRole = "petugas";
+
   // validasi
   if (!email || !password || !fullName) {
     return res.status(400).json({ message: "Data tidak lengkap" });
@@ -24,14 +27,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: "Email sudah digunakan" });
     }
 
-    //  hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    //  simpan ke Firestore
     await addDoc(collection(db, "users"), {
       email,
       fullName,
       password: hashedPassword,
+      role: userRole, // ✅ aman
       createdAt: new Date(),
     });
 
