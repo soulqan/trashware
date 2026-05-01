@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -37,8 +38,11 @@ export default function RegisterPage() {
       <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
         {/* KIRI (SAMA PERSIS LOGIN) */}
         <div className="flex flex-col">
+          {/* Logo */}
           <div className="flex items-center gap-4 mb-10">
-            <div className="bg-[#22c55e] p-3 rounded-2xl flex items-center justify-center text-white shadow-sm"></div>
+            {/* <div className="bg-[#ffffff] p-3 rounded-2xl flex items-center justify-center shadow-sm"> */}
+            <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={80} height={80} className="object-contain" />
+            {/* </div> */}
             <div>
               <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Trashware</h1>
               <p className="text-slate-500 text-sm font-medium">Monitoring System</p>
@@ -50,11 +54,11 @@ export default function RegisterPage() {
 
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="bg-white px-6 py-5 rounded-2xl shadow-sm border border-slate-100 flex-1">
-              <h3 className="text-[#22c55e] text-3xl font-bold mb-1">24/7</h3>
+              <h3 className="text-[#249357] text-3xl font-bold mb-1">24/7</h3>
               <p className="text-slate-500 text-sm font-medium">Real-time Monitoring</p>
             </div>
             <div className="bg-white px-6 py-5 rounded-2xl shadow-sm border border-slate-100 flex-1">
-              <h3 className="text-[#22c55e] text-3xl font-bold mb-1">IoT</h3>
+              <h3 className="text-[#249357] text-3xl font-bold mb-1">IoT</h3>
               <p className="text-slate-500 text-sm font-medium">Smart Integration</p>
             </div>
           </div>
@@ -77,7 +81,7 @@ export default function RegisterPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Nama lengkap"
-                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
+                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#249357] focus:ring-2 focus:ring-[#1b6e42]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
                   required
                 />
               </div>
@@ -90,7 +94,7 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nama@trashware.id"
-                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
+                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#249357] focus:ring-2 focus:ring-[#249357]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
                   required
                 />
               </div>
@@ -103,13 +107,13 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
+                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#249357] focus:ring-2 focus:ring-[#249357]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
                   required
                 />
               </div>
 
               {/* Button */}
-              <button type="submit" className="w-full bg-[#22c55e] hover:bg-[#16a34a] text-white font-medium py-3 rounded-xl transition-colors">
+              <button type="submit" className="w-full bg-[#249357] hover:bg-[#16a34a] text-white font-medium py-3 rounded-xl transition-colors">
                 Register
               </button>
 
@@ -129,7 +133,7 @@ export default function RegisterPage() {
               {/* Link ke Login */}
               <p className="text-sm text-center text-slate-500 mt-5">
                 Sudah punya akun?{" "}
-                <Link href="/auth/login" className="text-[#22c55e] hover:underline font-medium">
+                <Link href="/auth/login" className="text-[#249357] hover:underline font-medium">
                   Masuk
                 </Link>
               </p>

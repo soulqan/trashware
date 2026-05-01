@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,7 +37,9 @@ export default function LoginPage() {
         <div className="flex flex-col">
           {/* Logo */}
           <div className="flex items-center gap-4 mb-10">
-            <div className="bg-[#22c55e] p-3 rounded-2xl flex items-center justify-center text-white shadow-sm">{/* <Leaf size={32} strokeWidth={2.5} /> */}</div>
+            {/* <div className="bg-[#ffffff] p-3 rounded-2xl flex items-center justify-center shadow-sm"> */}
+            <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={80} height={80} className="object-contain" />
+            {/* </div> */}
             <div>
               <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Trashware</h1>
               <p className="text-slate-500 text-sm font-medium">Monitoring System</p>
@@ -51,12 +54,12 @@ export default function LoginPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Kartu 1 */}
             <div className="bg-white px-6 py-5 rounded-2xl shadow-sm border border-slate-100 flex-1">
-              <h3 className="text-[#22c55e] text-3xl font-bold mb-1">24/7</h3>
+              <h3 className="text-[#249357] text-3xl font-bold mb-1">24/7</h3>
               <p className="text-slate-500 text-sm font-medium">Real-time Monitoring</p>
             </div>
             {/* Kartu 2 */}
             <div className="bg-white px-6 py-5 rounded-2xl shadow-sm border border-slate-100 flex-1">
-              <h3 className="text-[#22c55e] text-3xl font-bold mb-1">IoT</h3>
+              <h3 className="text-[#249357] text-3xl font-bold mb-1">IoT</h3>
               <p className="text-slate-500 text-sm font-medium">Smart Integration</p>
             </div>
           </div>
@@ -79,7 +82,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nama@trashware.id"
-                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
+                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#249357] focus:ring-2 focus:ring-[#249357]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
                   required
                 />
               </div>
@@ -92,21 +95,21 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
+                  className="w-full bg-[#f8fafc] border-transparent focus:bg-white focus:border-[#249357] focus:ring-2 focus:ring-[#249357]/20 rounded-xl px-4 py-3 text-sm transition-all outline-none text-slate-700 placeholder:text-slate-400"
                   required
                 />
               </div>
 
               {/* Checkbox Ingat Saya */}
-              <div className="flex items-center gap-2 pt-1">
-                <input type="checkbox" id="remember" className="w-4 h-4 rounded border-slate-300 text-[#22c55e] focus:ring-[#22c55e] bg-[#f8fafc]" />
+              {/* <div className="flex items-center gap-2 pt-1">
+                <input type="checkbox" id="remember" className="w-4 h-4 rounded border-slate-300 text-[#249357] focus:ring-[#249357] bg-[#f8fafc]" />
                 <label htmlFor="remember" className="text-sm text-slate-600 cursor-pointer">
                   Ingat saya
                 </label>
-              </div>
+              </div> */}
 
               {/* Tombol Submit */}
-              <button type="submit" className="w-full bg-[#22c55e] hover:bg-[#16a34a] text-white font-medium py-3 rounded-xl transition-colors mt-2">
+              <button type="submit" className="w-full bg-[#249357] hover:bg-[#1b6e42] text-white font-medium py-3 rounded-xl transition-colors mt-2">
                 Masuk
               </button>
 
@@ -126,7 +129,7 @@ export default function LoginPage() {
               {/* Link ke Halaman Register */}
               <p className="text-sm text-center text-slate-500 mt-4">
                 Belum punya akun?{" "}
-                <Link href="/auth/register" className="text-[#22c55e] hover:underline font-medium">
+                <Link href="/auth/register" className="text-[#249357] hover:underline font-medium">
                   Daftar di sini
                 </Link>
               </p>

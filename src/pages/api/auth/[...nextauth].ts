@@ -1,11 +1,24 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import type { DefaultSession } from "next-auth";
 
 import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 
 import bcrypt from "bcryptjs";
+
+declare module "next-auth" {
+  interface User {
+    role?: string;
+  }
+  interface Session {
+    user: {
+      id?: string;
+      role?: string;
+    } & DefaultSession["user"];
+  }
+}
 
 export default NextAuth({
   providers: [
@@ -66,57 +79,67 @@ export default NextAuth({
   callbacks: {
     // 🔥 simpan user ke token
     async jwt({ token, user, account }) {
-      if (user) {
-        token.user = user;
+  // login credentials
+  if (user) {
+    token.id = user.id;
+    token.name = user.name;
+    token.email = user.email;
+    token.role = user.role;
+  }
+
+  // login Google
+  if (account?.provider === "google") {
+    const q = query(
+      collection(db, "users"),
+      where("email", "==", token.email)
+    );
+
+    const snapshot = await getDocs(q);
+
+    let dbUser;
+
+    if (snapshot.empty) {
+      const newUser = await addDoc(collection(db, "users"), {
+        email: token.email,
+        fullName: token.name,
+        password: null,
+        role: "petugas",
+        createdAt: new Date(),
+      });
+
+      dbUser = {
+        id: newUser.id,
+        name: token.name,
+        email: token.email,
+        role: "petugas",
+      };
+    } else {
+      const docSnap = snapshot.docs[0];
+      const data = docSnap.data();
+
+      dbUser = {
+        id: docSnap.id,
+        name: data.fullName,
+        email: data.email,
+        role: data.role,
+      };
+    }
+
+    token.id = dbUser.id;
+    token.name = dbUser.name;
+    token.email = dbUser.email;
+    token.role = dbUser.role;
+  }
+
+return token;
+  },
+
+  // 🔥 ambil ke session (simple dulu)
+  async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
-
-      // login Google
-      if (account?.provider === "google") {
-        const q = query(
-          collection(db, "users"),
-          where("email", "==", token.email)
-        );
-
-        const snapshot = await getDocs(q);
-
-        let dbUser;
-
-        if (snapshot.empty) {
-          const newUser = await addDoc(collection(db, "users"), {
-            email: token.email,
-            fullName: token.name,
-            password: null,
-            role: "petugas",
-            createdAt: new Date(),
-          });
-
-          dbUser = {
-            id: newUser.id,
-            name: token.name,
-            email: token.email,
-            role: "petugas",
-          };
-        } else {
-          const docSnap = snapshot.docs[0];
-          const data = docSnap.data();
-
-          dbUser = {
-            id: docSnap.id,
-            name: data.fullName,
-            email: data.email,
-            role: data.role,
-          };
-        }
-
-        token.user = dbUser;
-      }
-
-      return token;
-    },
-
-    // 🔥 ambil ke session (simple dulu)
-    async session({ session, token }) {
-      session.user = token.user as { id: string; name: string; email: string; role: string };
       return session;
     },
   },

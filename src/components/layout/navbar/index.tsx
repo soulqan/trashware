@@ -73,7 +73,7 @@ export default function Navbar() {
           <div className="text-right">
             {/* <p className="text-sm font-bold text-gray-800">Admin User</p> */}
             <p className="text-sm font-bold text-gray-800">{session?.user?.name || "Loading..."}</p>
-            {/* <p className="text-[10px] text-gray-400 font-medium">{session?.user?.role ?? "Loading..."}</p> */}
+            <p className="text-xs text-gray-400 capitalize">{session?.user?.role}</p>
           </div>
           <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold border-2 border-white shadow-sm">AU</div>
         </div>
