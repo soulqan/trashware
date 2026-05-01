@@ -1,12 +1,14 @@
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
+import { Bin } from '@/types/database';
 import { notificationReadService } from './notificationReadService';
 
 export interface DerivedNotification {
   id: string;
   binId: string;
-  building: string;
-  floor: string;
+  gedung: string;
+  lantai: string;
+  ruang: string;
   location: string;
   title: string;
   description: string;
@@ -17,7 +19,7 @@ export interface DerivedNotification {
 }
 
 export const deriveNotificationService = {
-  // Subscribe to bins and derive notifications (ONLY FULL BINS >= 90%)
+  // Subscribe to bins and derive notifications (ONLY FULL BINS - level >= 90)
   subscribeToDerivedNotifications(
     callback: (notifications: DerivedNotification[]) => void
   ) {
@@ -25,30 +27,36 @@ export const deriveNotificationService = {
       const bins = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      })) as any[];
+      })) as Bin[];
 
-      // Derive notifications from FULL bins only (>= 90%)
+      // Derive notifications from FULL bins only (level >= 90)
       const derivedNotifications = bins
-        .filter((bin) => bin.capacity >= 90) // Only full bins
+        .filter((bin) => bin.level >= 90) // Only full bins
         .map((bin) => {
-          // Extract building dan floor dari data yang tersedia
-          const location = bin.location || 'Unknown Location';
+          // Generate location dari gedung, lantai, ruang
+          const location = `${bin.gedung} - ${bin.lantai} - ${bin.ruang}`;
+          
+          // Convert lastUpdate ke Date jika ada, jika tidak gunakan waktu saat ini
+          const timestamp = bin.lastUpdate 
+            ? (bin.lastUpdate.toDate ? bin.lastUpdate.toDate() : new Date(bin.lastUpdate))
+            : new Date();
 
           return {
             id: bin.id,
             binId: bin.id,
-            building: bin.building || 'Tempat Sampah',
-            floor: bin.floor || 'Lokasi',
+            gedung: bin.gedung,
+            lantai: bin.lantai,
+            ruang: bin.ruang,
             location: location,
             title: location,
-            description: `${location} penuh (${bin.capacity}%) - segera kosongkan`,
+            description: `${location} penuh (level ${bin.level}) - segera kosongkan`,
             capacity: bin.capacity,
             status: 'baru' as const, // All are new/unread
             type: 'error' as const, // All are error (full)
-            timestamp: new Date(),
+            timestamp: timestamp,
           } as DerivedNotification;
         })
-        .sort((a, b) => b.capacity - a.capacity); // Sort by capacity descending
+        .sort((a, b) => b.level - a.level); // Sort by level descending
 
       callback(derivedNotifications);
     });
@@ -56,7 +64,7 @@ export const deriveNotificationService = {
     return unsubscribe;
   },
 
-  // Get derived notification counts (ONLY FULL BINS) - Real-time with read status
+  // Get derived notification counts (ONLY FULL BINS - level >= 90) - Real-time with read status
   subscribeToNotificationCounts(
     callback: (counts: { semua: number; baru: number; dibaca: number }) => void
   ) {
@@ -80,8 +88,8 @@ export const deriveNotificationService = {
     });
 
     const updateCounts = () => {
-      // Get only FULL bins (>= 90%)
-      const fullBins = binsData.filter((b) => b.capacity >= 90);
+      // Get only FULL bins (level >= 90)
+      const fullBins = binsData.filter((b) => b.level >= 90);
       const fullBinIds = new Set(fullBins.map((b) => b.id));
 
       // Clean up read notifications for bins that are no longer full
@@ -110,7 +118,7 @@ export const deriveNotificationService = {
     callback: (notifications: DerivedNotification[]) => void,
     filter?: 'semua' | 'baru' | 'dibaca'
   ) {
-    let binsData: any[] = [];
+    let binsData: Bin[] = [];
     let readIds: string[] = [];
 
     // Subscribe to bins
@@ -118,7 +126,7 @@ export const deriveNotificationService = {
       binsData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      })) as any[];
+      })) as Bin[];
 
       updateNotifications();
     });
@@ -130,8 +138,8 @@ export const deriveNotificationService = {
     });
 
     const updateNotifications = () => {
-      // Get only FULL bins (>= 90%)
-      const fullBins = binsData.filter((bin) => bin.capacity >= 90);
+      // Get only FULL bins (level >= 90)
+      const fullBins = binsData.filter((bin) => bin.level >= 90);
       const fullBinIds = new Set(fullBins.map((b) => b.id));
 
       // Clean up read notifications for bins that are no longer full
@@ -139,31 +147,37 @@ export const deriveNotificationService = {
         fullBinIds
       );
 
-      // Derive notifications from FULL bins only (>= 90%)
+      // Derive notifications from FULL bins only (level >= 90)
       const derivedNotifications = fullBins
         .map((bin) => {
-          const location = bin.location || 'Unknown Location';
+          const location = `${bin.gedung} - ${bin.lantai} - ${bin.ruang}`;
           const isRead = readIds.includes(bin.id);
+          
+          // Convert lastUpdate ke Date jika ada, jika tidak gunakan waktu saat ini
+          const timestamp = bin.lastUpdate 
+            ? (bin.lastUpdate.toDate ? bin.lastUpdate.toDate() : new Date(bin.lastUpdate))
+            : new Date();
 
           return {
             id: bin.id,
             binId: bin.id,
-            building: bin.building || 'Tempat Sampah',
-            floor: bin.floor || 'Lokasi',
+            gedung: bin.gedung,
+            lantai: bin.lantai,
+            ruang: bin.ruang,
             location: location,
             title: location,
-            description: `${location} penuh (${bin.capacity}%) - segera kosongkan`,
+            description: `${location} penuh (level ${bin.level}) - segera kosongkan`,
             capacity: bin.capacity,
             status: isRead ? 'dibaca' : 'baru',
             type: 'error' as const,
-            timestamp: new Date(),
+            timestamp: timestamp,
           } as DerivedNotification;
         })
         .filter((notif) => {
           if (!filter || filter === 'semua') return true;
           return notif.status === filter;
         })
-        .sort((a, b) => b.capacity - a.capacity);
+        .sort((a, b) => b.level - a.level);
 
       callback(derivedNotifications);
     };

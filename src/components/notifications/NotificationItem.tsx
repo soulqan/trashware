@@ -1,5 +1,4 @@
 import { DerivedNotification } from '@/lib/services/deriveNotificationService';
-import { notificationReadService } from '@/lib/services/notificationReadService';
 import { FiAlertCircle, FiAlertTriangle } from 'react-icons/fi';
 
 interface NotificationItemProps {
@@ -24,14 +23,6 @@ export default function NotificationItem({
     if (days < 7) return `${days} hari lalu`;
     
     return date.toLocaleDateString('id-ID');
-  };
-
-  const handleMarkAsNew = async () => {
-    try {
-      await notificationReadService.markAsNew(notification.id);
-    } catch (error) {
-      console.error('Failed to mark as new:', error);
-    }
   };
 
   const getIconStyles = () => {
@@ -71,7 +62,7 @@ export default function NotificationItem({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <h3 className="font-bold text-gray-900 text-sm">
-          {notification.location}
+          {notification.gedung} - {notification.lantai} - {notification.ruang}
         </h3>
         <p className="text-gray-600 text-sm mt-1">{notification.description}</p>
         <p className="text-gray-400 text-xs mt-2 flex items-center gap-1">
@@ -79,7 +70,7 @@ export default function NotificationItem({
         </p>
       </div>
 
-      {/* Button - Show based on read status */}
+      {/* Button - Show only if status is 'baru' (unread) */}
       {notification.status === 'baru' ? (
         <button
           onClick={() => onMarkAsRead(notification.id)}
@@ -88,12 +79,9 @@ export default function NotificationItem({
           Baru
         </button>
       ) : (
-        <button
-          onClick={handleMarkAsNew}
-          className="px-4 py-1.5 bg-gray-300 hover:bg-gray-400 text-gray-700 text-sm font-semibold rounded-lg transition shrink-0"
-        >
+        <div className="px-4 py-1.5 bg-gray-200 text-gray-600 text-sm font-semibold rounded-lg shrink-0">
           Dibaca
-        </button>
+        </div>
       )}
     </div>
   );
