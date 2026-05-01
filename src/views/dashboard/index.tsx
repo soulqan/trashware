@@ -3,15 +3,16 @@ import PageContainer from '@/components/layout/PageContainer';
 import PageHeader from '@/components/layout/PageHeader'; 
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import { useSearch } from '@/context/SearchContext';
 import StatCard from '@/components/dashboard/StatCard';
-import BinCard from '@/components/dashboard/BinCard';
 import { FiTrash2, FiCheckCircle, FiAlertTriangle, FiXCircle, FiWifiOff } from 'react-icons/fi';
+import { getPickupPriorityRanking } from '@/lib/services/historyAnalyticsService';
+import { subscribeHistoryRecords } from '@/lib/services/historyService';
+import type { HistoryRecord } from '@/lib/services/historyService';
 
 export default function DashboardView() {
-  const [bins, setBins] = useState<any[]>([]);
+  const [bins, setBins] = useState<Array<{ id: string; gedung?: string; lantai?: string | number; ruang?: string; level?: number; status?: string; capacity?: number; location?: string }>>([])
   const [loading, setLoading] = useState(true);
-  const { searchQuery } = useSearch();
+  const [historyRecords, setHistoryRecords] = useState<HistoryRecord[]>([]);
 
   useEffect(() => {
     const q = query(collection(db, "bins"));
@@ -23,18 +24,10 @@ export default function DashboardView() {
     return () => unsubscribe();
   }, []);
 
-  const filteredBins = bins.filter((bin) => {
-    // Menggunakan variabel 'level' sesuai DB baru
-    const fillLevel = bin.level ?? 0;
-    const isFull = bin.status === 'on' && fillLevel >= 90;
-    const isProblematic = isFull || bin.status === 'off';
-
-    // Update target pencarian agar mencakup gedung, lantai, dan ruang
-    const searchTarget = `${bin.gedung} ${bin.lantai} ${bin.ruang} ${bin.id}`.toLowerCase();
-    const matchesSearch = searchTarget.includes(searchQuery.toLowerCase());
-
-    return isProblematic && matchesSearch;
-  });
+  useEffect(() => {
+    const unsub = subscribeHistoryRecords((data) => setHistoryRecords(data), (err) => console.error(err));
+    return () => unsub();
+  }, []);
 
   const stats = {
     total: bins.length,
@@ -81,7 +74,7 @@ export default function DashboardView() {
       )}
 
       {/* 3. Monitoring Real-time */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <div className="flex flex-col">
           <h2 className="text-xl font-black text-gray-800">Monitoring Real-time</h2>
           <p className="text-xs text-gray-400">
@@ -95,12 +88,12 @@ export default function DashboardView() {
               <BinCard
                 key={bin.id}
                 id={bin.id}
-                gedung={bin.gedung}
-                lantai={bin.lantai}
-                ruang={bin.ruang}
-                level={bin.level}
-                status={bin.status}
-                capacity={bin.capacity}
+                gedung={bin.gedung || ''}
+                lantai={String(bin.lantai || '')}
+                ruang={bin.ruang || ''}
+                level={bin.level || 0}
+                status={bin.status === 'on' ? 'on' : 'off'}
+                capacity={bin.capacity || 0}
               />
             ))
           ) : (
@@ -108,6 +101,83 @@ export default function DashboardView() {
               Data tidak ditemukan...
             </div>
           )}
+        </div>
+      </div> */}
+
+      {/* 4. Prioritas Pengambilan - Leaderboard */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-black text-gray-800">Prioritas Pengambilan</h2>
+          <p className="text-xs text-gray-400">Berdasarkan lamanya sampah penuh dan belum diambil</p>
+        </div>
+
+        <div className="space-y-3">
+          {(() => {
+            const ranking = getPickupPriorityRanking(bins, historyRecords).slice(0, 10);
+
+            if (!ranking || ranking.length === 0) return (
+              <div className="py-6 text-center text-gray-400 italic text-sm">Tidak ada prioritas saat ini</div>
+            );
+
+            return ranking.map((r, idx) => (
+              <div key={r.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-red-300 transition-all flex items-center gap-4">
+                {/* Rank Badge */}
+                <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-white text-lg flex-shrink-0 ${
+                  idx === 0 ? 'bg-red-600' :
+                  idx === 1 ? 'bg-orange-500' :
+                  idx === 2 ? 'bg-amber-500' :
+                  'bg-gray-400'
+                }`}>
+                  #{idx + 1}
+                </div>
+
+                {/* Location & Details */}
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-gray-800 text-sm">{r.location}</div>
+                  <div className="text-xs text-gray-500 mt-1">ID: {r.binId}</div>
+                  
+                  {/* Capacity Bar */}
+                  <div className="mt-2">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs font-medium text-gray-500">Level Isi</span>
+                      <span className="text-xs font-bold text-red-500">{r.capacity}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-red-500 h-2 rounded-full transition-all" 
+                        style={{ width: `${Math.min(r.capacity, 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  {/* Reason
+                  {r.reason && (
+                    <div className="text-xs text-gray-600 mt-2 italic">
+                      {r.reason}
+                    </div>
+                  )} */}
+
+                  {/* Full Age */}
+                  {r.fullAgeMinutes !== null && (
+                    <div className="text-xs text-orange-600 font-semibold mt-1">
+                      Penuh selama: {r.fullAgeMinutes} menit
+                    </div>
+                  )}
+                </div>
+
+                {/* Priority Label */}
+                <div className="flex-shrink-0">
+                  <div className={`text-xs font-bold px-3 py-2 rounded-lg text-center ${
+                    r.priorityLabel === 'High' ? 'bg-red-100 text-red-600' :
+                    r.priorityLabel === 'Medium' ? 'bg-orange-100 text-orange-600' :
+                    'bg-yellow-100 text-yellow-600'
+                  }`}>
+                    {r.priorityLabel}
+                  </div>
+                </div>
+              </div>
+            ));
+          })()}
         </div>
       </div>
     </PageContainer>

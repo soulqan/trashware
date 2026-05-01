@@ -1,4 +1,4 @@
-import { FiSearch, FiBell, FiMoon } from "react-icons/fi";
+import { FiSearch, FiBell } from "react-icons/fi";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { deriveNotificationService } from "@/lib/services/deriveNotificationService";
@@ -54,10 +54,6 @@ export default function Navbar() {
       {/* Right Side Icons & Profile */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-4 text-gray-500">
-          <button className="hover:text-emerald-500 transition-colors">
-            <FiMoon size={20} />
-          </button>
-
           <button onClick={handleBellClick} className="relative hover:text-emerald-500 cursor-pointer transition-colors group">
             <FiBell size={20} />
             {notificationCount > 0 && (
