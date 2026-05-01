@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { updateDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { FiX } from 'react-icons/fi';
+import { Bin } from '@/types/database';
 
-export interface BinData {
+export interface BinData extends Bin {
   firestoreId?: string;
-  id: string;
-  name: string;
-  location: string;
-  capacity: number; // Berfungsi sebagai level isi
-  status: 'on' | 'off';
 }
 
 interface ManageBinProps {
@@ -21,38 +17,62 @@ interface ManageBinProps {
 export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps) {
   const [formData, setFormData] = useState<BinData>({
     id: "",
-    name: "",
-    location: "",
+    gedung: "",
+    lantai: "",
+    ruang: "",
     capacity: 0,
+    level: 0,
     status: 'on'
   });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (editData) {
       setFormData(editData);
     } else {
-      setFormData({ id: "", name: "", location: "", capacity: 0, status: 'on' });
+      setFormData({ 
+        id: "", 
+        gedung: "",
+        lantai: "",
+        ruang: "",
+        capacity: 0,
+        level: 0,
+        status: 'on' 
+      });
     }
   }, [editData, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    
     try {
+      // Validasi ID wajib untuk create bin baru
+      if (!editData && !formData.id.trim()) {
+        setError('ID Bin wajib diisi');
+        return;
+      }
+
       if (editData?.firestoreId) {
+        // UPDATE existing bin
         const docRef = doc(db, "bins", editData.firestoreId);
         const { firestoreId, ...dataToSave } = formData;
-        await updateDoc(docRef, dataToSave);
+        await updateDoc(docRef, {
+          ...dataToSave,
+          lastUpdate: serverTimestamp()
+        });
       } else {
-        const finalId = formData.id || `BIN-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
-        await addDoc(collection(db, "bins"), {
+        // CREATE new bin dengan ID sebagai document ID
+        const docRef = doc(db, "bins", formData.id);
+        await setDoc(docRef, {
           ...formData,
-          id: finalId,
-          last_updated: new Date().toISOString()
+          lastUpdate: serverTimestamp()
         });
       }
       onClose();
     } catch (error) {
       console.error("Firebase Error:", error);
+      setError('Gagal menyimpan data. Silakan coba lagi.');
     }
   };
 
@@ -67,59 +87,114 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
         
         <div className="mb-6">
           <h2 className="text-xl font-bold text-gray-800">{editData ? 'Edit Data Bin' : 'Tambah Bin Baru'}</h2>
-          <p className="text-sm text-blue-400 mt-1">Konfigurasi perangkat dan level isi (Maks 100L)</p>
+          <p className="text-sm text-blue-400 mt-1">Konfigurasi lokasi dan kapasitas tempat sampah</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* ID - Read only untuk edit, required untuk create */}
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-gray-700 ml-1">Nama Tempat Sampah</label>
+            <label className="text-sm font-semibold text-gray-700 ml-1">
+              ID Bin {!editData && <span className="text-red-500">*</span>}
+            </label>
+            <input 
+              className={`w-full px-4 py-3 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${
+                editData 
+                  ? 'bg-gray-100 border border-gray-100 text-gray-600 cursor-not-allowed' 
+                  : 'bg-gray-50 border border-gray-100'
+              }`}
+              placeholder={editData ? undefined : "Contoh: BIN-001"}
+              value={formData.id}
+              onChange={(e) => !editData && setFormData({...formData, id: e.target.value})}
+              disabled={!!editData}
+              required={!editData}
+            />
+          </div>
+
+          {/* Gedung */}
+          <div className="space-y-1">
+            <label className="text-sm font-semibold text-gray-700 ml-1">Gedung/Lokasi</label>
             <input 
               className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              placeholder="Contoh: Gedung A"
+              value={formData.gedung}
+              onChange={(e) => setFormData({...formData, gedung: e.target.value})}
               required
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-gray-700 ml-1">Lokasi</label>
-            <input 
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
-              value={formData.location}
-              onChange={(e) => setFormData({...formData, location: e.target.value})}
-              required
-            />
-          </div>
-
+          {/* Lantai dan Ruang */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-emerald-600 ml-1">Kapasitas Isi (L)</label>
+              <label className="text-sm font-semibold text-gray-700 ml-1">Lantai</label>
               <input 
-                type="number" max="100" min="0"
-                className="w-full px-4 py-3 bg-gray-50 border border-emerald-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                value={formData.capacity}
-                onChange={(e) => setFormData({...formData, capacity: Number(e.target.value)})}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                placeholder="Contoh: 3"
+                value={formData.lantai}
+                onChange={(e) => setFormData({...formData, lantai: e.target.value})}
                 required
               />
             </div>
-            
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-gray-700 ml-1">Status Perangkat</label>
-              <select 
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
-                value={formData.status}
-                onChange={(e) => setFormData({...formData, status: e.target.value as 'on' | 'off'})}
-              >
-                <option value="on">ON (Active)</option>
-                <option value="off">OFF (Inactive)</option>
-              </select>
+              <label className="text-sm font-semibold text-gray-700 ml-1">Ruang</label>
+              <input 
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                placeholder="Contoh: Pantry"
+                value={formData.ruang}
+                onChange={(e) => setFormData({...formData, ruang: e.target.value})}
+                required
+              />
             </div>
           </div>
+
+          {/* Capacity dan Level */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-sm font-semibold text-gray-700 ml-1">Kapasitas (L)</label>
+              <input 
+                type="number" min="0"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                placeholder="Contoh: 100"
+                value={formData.capacity}
+                onChange={(e) => setFormData({...formData, capacity: e.target.value ? Number(e.target.value) : 0})}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-semibold text-emerald-600 ml-1">Level Isi (%)</label>
+              <input 
+                type="number" max="100" min="0"
+                className="w-full px-4 py-3 bg-gray-50 border border-emerald-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                placeholder="0-100"
+                value={formData.level}
+                onChange={(e) => setFormData({...formData, level: Number(e.target.value)})}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Status */}
+          <div className="space-y-1">
+            <label className="text-sm font-semibold text-gray-700 ml-1">Status Perangkat</label>
+            <select 
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+              value={formData.status}
+              onChange={(e) => setFormData({...formData, status: e.target.value as 'on' | 'off'})}
+            >
+              <option value="on">ON (Active)</option>
+              <option value="off">OFF (Inactive)</option>
+            </select>
+          </div>
+
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-sm text-red-600 font-medium">{error}</p>
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-6">
             <button type="button" onClick={onClose} className="px-8 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
             <button type="submit" className="px-8 py-2.5 text-sm font-semibold bg-[#00D26A] text-white rounded-xl shadow-lg shadow-emerald-50 hover:bg-[#00b95d] active:scale-95 transition-all">
-              Simpan Perubahan
+              {editData ? 'Perbarui' : 'Tambah'} Bin
             </button>
           </div>
         </form>

@@ -34,7 +34,7 @@ export default function ManageView() {
   };
 
   const filteredBins = bins.filter((bin) => {
-    const searchTarget = `${bin.location} ${bin.name} ${bin.id}`.toLowerCase();
+    const searchTarget = `${bin.ruang} ${bin.lantai} ${bin.gedung} ${bin.id}`.toLowerCase();
     return searchTarget.includes(searchQuery.toLowerCase());
   });
 
@@ -69,8 +69,9 @@ export default function ManageView() {
             <thead className="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest font-black text-left">
               <tr>
                 <th className="px-6 py-5">ID</th>
-                <th className="px-6 py-5">Nama</th>
-                <th className="px-6 py-5">Lokasi</th>
+                <th className="px-6 py-5">Gedung</th>
+                <th className="px-6 py-5">Lantai</th>
+                <th className="px-6 py-5">Ruang</th>
                 <th className="px-6 py-5">Kapasitas</th>
                 <th className="px-6 py-5">Level Isi</th>
                 <th className="px-6 py-5 text-center">Status Isi</th>
@@ -80,25 +81,25 @@ export default function ManageView() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filteredBins.map((bin) => {
-                const fillLevel = bin.capacity || 0;
-                const percentage = Math.round((fillLevel / 100) * 100);
+                const level = bin.level || 0;
                 const isOnline = bin.status === 'on';
 
                 return (
                   <tr key={bin.firestoreId} className="hover:bg-gray-50/40 transition-colors">
                     <td className="px-6 py-4 text-sm font-bold text-emerald-600 tracking-tight">{bin.id}</td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-700">{bin.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-400 font-medium">{bin.location}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500 font-bold italic">100L</td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-700">{fillLevel}L ({percentage}%)</td>
+                    <td className="px-6 py-4 text-sm font-bold text-gray-700">{bin.gedung}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">{bin.lantai}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">{bin.ruang}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500 font-bold italic">{bin.capacity}L</td>
+                    <td className="px-6 py-4 text-sm font-bold text-gray-700">{level}%</td>
                     
                     <td className="px-6 py-4 text-center">
                       <span className={`px-4 py-1.5 rounded-xl text-[11px] font-bold text-white inline-block w-28 text-center shadow-sm ${
-                        percentage >= 90 ? 'bg-[#FF3B30]' : 
-                        percentage >= 70 ? 'bg-[#FFCC00]' : 
-                        percentage > 0 ? 'bg-[#00D26A]' : 'bg-gray-400'
+                        level >= 90 ? 'bg-[#FF3B30]' : 
+                        level >= 70 ? 'bg-[#FFCC00]' : 
+                        level > 0 ? 'bg-[#00D26A]' : 'bg-gray-400'
                       }`}>
-                        {percentage >= 90 ? 'Penuh' : percentage >= 70 ? 'Hampir Penuh' : percentage > 0 ? 'Terisi' : 'Kosong'}
+                        {level >= 90 ? 'Penuh' : level >= 70 ? 'Hampir Penuh' : level > 0 ? 'Terisi' : 'Kosong'}
                       </span>
                     </td>
 
