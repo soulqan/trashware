@@ -20,7 +20,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Component {...pageProps} />
         ) : (
           // pakai layout
-          <div className="flex min-h-screen">
+          <div className="flex min-h-screen bg-white text-gray-900">
             <Sidebar />
             <div className="flex-1 flex flex-col">
               <Navbar />

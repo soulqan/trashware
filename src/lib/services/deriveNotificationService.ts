@@ -12,6 +12,7 @@ export interface DerivedNotification {
   location: string;
   title: string;
   description: string;
+  level: number;
   capacity: number;
   status: 'baru' | 'dibaca';
   type: 'error' | 'warning' | 'info';
@@ -50,6 +51,7 @@ export const deriveNotificationService = {
             location: location,
             title: location,
             description: `${location} penuh (level ${bin.level}) - segera kosongkan`,
+            level: bin.level,
             capacity: bin.capacity,
             status: 'baru' as const, // All are new/unread
             type: 'error' as const, // All are error (full)
@@ -167,6 +169,7 @@ export const deriveNotificationService = {
             location: location,
             title: location,
             description: `${location} penuh (level ${bin.level}) - segera kosongkan`,
+            level: bin.level,
             capacity: bin.capacity,
             status: isRead ? 'dibaca' : 'baru',
             type: 'error' as const,

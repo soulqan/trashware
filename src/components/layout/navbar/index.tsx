@@ -1,4 +1,4 @@
-import { FiSearch, FiBell, FiMoon } from "react-icons/fi";
+import { FiSearch, FiBell } from "react-icons/fi";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { deriveNotificationService } from "@/lib/services/deriveNotificationService";
@@ -54,10 +54,6 @@ export default function Navbar() {
       {/* Right Side Icons & Profile */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-4 text-gray-500">
-          <button className="hover:text-emerald-500 transition-colors">
-            <FiMoon size={20} />
-          </button>
-
           <button onClick={handleBellClick} className="relative hover:text-emerald-500 cursor-pointer transition-colors group">
             <FiBell size={20} />
             {notificationCount > 0 && (
@@ -73,7 +69,7 @@ export default function Navbar() {
           <div className="text-right">
             {/* <p className="text-sm font-bold text-gray-800">Admin User</p> */}
             <p className="text-sm font-bold text-gray-800">{session?.user?.name || "Loading..."}</p>
-            {/* <p className="text-[10px] text-gray-400 font-medium">{session?.user?.role ?? "Loading..."}</p> */}
+            <p className="text-xs text-gray-400 capitalize">{session?.user?.role}</p>
           </div>
           <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold border-2 border-white shadow-sm">AU</div>
         </div>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FiLogOut } from "react-icons/fi";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 const menuItems = [
   { name: "Dashboard", icon: <FiGrid />, path: "/", role: ["admin", "petugas"] },
@@ -29,12 +30,14 @@ export default function Sidebar() {
     <div className="h-screen w-64 bg-white border-r border-gray-100 flex flex-col justify-between p-4 sticky top-0">
       <div>
         {/* Logo Section */}
-        <div className="flex items-center gap-3 px-2 mb-10">
-          <div className="bg-emerald-500 p-2 rounded-xl text-white">
-            <FiTrash2 size={24} />
-          </div>
+
+        <div className="flex items-center gap-1 px-2 mb-10">
+          {/* <div className="bg-emerald-500 p-2 rounded-xl"> */}
+          <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={50} height={50} className="object-contain" />
+          {/* </div> */}
+
           <div>
-            <h2 className="text-lg font-bold text-gray-800 leading-tight">SmartBin</h2>
+            <h2 className="text-lg font-bold text-gray-800 leading-tight">TrashWare</h2>
             <p className="text-[10px] text-gray-400 font-medium tracking-widest uppercase">IoT Monitoring</p>
           </div>
         </div>

@@ -55,6 +55,9 @@ export const subscribeBinsToHistoryHourly = () => {
             const data = binDoc.data() as {
               id?: string;
               location?: string;
+              gedung?: string;
+              lantai?: string | number;
+              ruang?: string;
               capacity?: number;
             };
 
@@ -71,9 +74,17 @@ export const subscribeBinsToHistoryHourly = () => {
               return;
             }
 
+            // Compose a readable location string from available fields
+            const composedLocation =
+              data.location ||
+              [data.gedung, data.lantai, data.ruang]
+                .filter((p) => p !== undefined && p !== null && String(p).trim() !== '')
+                .join(' - ') ||
+              'Lokasi Tidak Diketahui';
+
             await setDoc(historyDocRef, {
               binId,
-              location: data.location ?? 'Lokasi Tidak Diketahui',
+              location: composedLocation,
               capacity: data.capacity,
               timestamp: serverTimestamp(),
               source: 'sync-from-bins',
@@ -100,10 +111,17 @@ export const subscribeHistoryRecords = (onData: (data: HistoryRecord[]) => void,
     (snapshot) => {
       const mapped = snapshot.docs.map((historyDoc) => {
         const data = historyDoc.data();
+        const composedLocation =
+          data.location ||
+          [data.gedung, data.lantai, data.ruang]
+            .filter((p) => p !== undefined && p !== null && String(p).trim() !== '')
+            .join(' - ') ||
+          'Lokasi Tidak Diketahui';
+
         return {
           id: historyDoc.id,
           binId: data.binId || 'Unknown ID',
-          location: data.location || 'Lokasi Tidak Diketahui',
+          location: composedLocation,
           capacity: data.capacity || 0,
           timestamp: parseFirestoreDate(data.timestamp),
         };
