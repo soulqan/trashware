@@ -16,7 +16,7 @@ export default function DashboardPage() {
   if (status === "loading") return <p>Loading...</p>;
 
   return (
-    <div className="flex min-h-screen bg-[#F9FAFB]">
+    <div className="flex min-h-screen bg-white">
       <div className="flex-1">
         <main>
           <DashboardView />
