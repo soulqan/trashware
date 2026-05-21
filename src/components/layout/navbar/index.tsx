@@ -66,12 +66,19 @@ export default function Navbar() {
 
         {/* User Profile */}
         <div className="flex items-center gap-3 border-l pl-6 border-gray-200">
-          <div className="text-right">
-            {/* <p className="text-sm font-bold text-gray-800">Admin User</p> */}
-            <p className="text-sm font-bold text-gray-800">{session?.user?.name || "Loading..."}</p>
-            <p className="text-xs text-gray-400 capitalize">{session?.user?.role}</p>
-          </div>
-          <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold border-2 border-white shadow-sm">AU</div>
+          <button onClick={() => router.push("/profile")} className="flex items-center gap-3 hover:opacity-80 transition">
+            <div className="text-right">
+              <p className="text-sm font-bold text-gray-800">{session?.user?.name || "Loading..."}</p>
+              <p className="text-xs text-gray-400 capitalize">{(session as any)?.user?.role || "user"}</p>
+            </div>
+            {session?.user?.image ? (
+              <img src={session.user.image} alt="avatar" className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
+            ) : (
+              <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold border-2 border-white shadow-sm">
+                {(session?.user?.name || "").split(" ").map((n: string) => n[0]).slice(0,2).join("")}
+              </div>
+            )}
+          </button>
         </div>
       </div>
     </header>
