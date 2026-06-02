@@ -5,7 +5,7 @@ import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import StatCard from '@/components/dashboard/StatCard';
 import { FiTrash2, FiCheckCircle, FiAlertTriangle, FiXCircle, FiWifiOff } from 'react-icons/fi';
-import { getPickupPriorityRanking } from '@/lib/services/historyAnalyticsService';
+import { formatDurationInHours, getPickupPriorityRanking } from '@/lib/services/historyAnalyticsService';
 import { subscribeHistoryRecords } from '@/lib/services/historyService';
 import type { HistoryRecord } from '@/lib/services/historyService';
 
@@ -158,9 +158,9 @@ export default function DashboardView() {
                   )} */}
 
                   {/* Full Age */}
-                  {r.fullAgeMinutes !== null && (
+                  {r.fullAgeMinutes != null && (
                     <div className="text-xs text-orange-600 font-semibold mt-1">
-                      Penuh selama: {r.fullAgeMinutes} menit
+                      Penuh selama: {formatDurationInHours(r.fullAgeMinutes)}
                     </div>
                   )}
                 </div>

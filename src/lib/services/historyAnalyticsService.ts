@@ -34,6 +34,19 @@ export const formatHourRange = (hour: number) => {
   return `${start}:00-${end}:00`;
 };
 
+export const formatDurationInHours = (minutes: number) => {
+  if (minutes < 60) return `${minutes} menit`;
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  if (remainingMinutes === 0) {
+    return `${hours} jam`;
+  }
+
+  return `${hours} jam ${remainingMinutes} menit`;
+};
+
 export const getFilteredRecords = (
   historyRecords: HistoryRecord[],
   selectedLocation: string,
@@ -266,7 +279,7 @@ export const getPickupPriorityRanking = (
     // reason summary
     const reasons: string[] = [];
     reasons.push('Penuh');
-    if (fullAgeMinutes !== null) reasons.push(`Penuh selama ${fullAgeMinutes} menit`);
+    if (fullAgeMinutes !== null) reasons.push(`Penuh selama ${formatDurationInHours(fullAgeMinutes)}`);
 
     const priorityLabel: BinPriorityItem['priorityLabel'] = score >= 100 ? 'High' : score >= 60 ? 'Medium' : 'Low';
 
