@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { db } from '@/lib/firebase';
 import { updateDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { FiX } from 'react-icons/fi';
@@ -26,22 +26,6 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
   });
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (editData) {
-      setFormData(editData);
-    } else {
-      setFormData({ 
-        id: "", 
-        gedung: "",
-        lantai: "",
-        ruang: "",
-        capacity: 0,
-        level: 0,
-        status: 'on' 
-      });
-    }
-  }, [editData, isOpen]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -56,7 +40,8 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
       if (editData?.firestoreId) {
         // UPDATE existing bin
         const docRef = doc(db, "bins", editData.firestoreId);
-        const { firestoreId, ...dataToSave } = formData;
+        const dataToSave = { ...formData };
+        delete dataToSave.firestoreId;
         await updateDoc(docRef, {
           ...dataToSave,
           lastUpdate: serverTimestamp()
@@ -80,7 +65,7 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px] p-4 font-sans text-left">
-      <div className="bg-white w-full max-w-lg rounded-[24px] shadow-2xl relative p-8">
+      <div className="relative w-full max-w-lg rounded-[24px] bg-white p-6 shadow-2xl sm:p-8">
         <button onClick={onClose} className="absolute top-6 right-6 p-1 text-gray-400 hover:text-gray-600 transition-colors">
           <FiX size={20} />
         </button>
@@ -123,7 +108,7 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
           </div>
 
           {/* Lantai dan Ruang */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1">
               <label className="text-sm font-semibold text-gray-700 ml-1">Lantai</label>
               <input 
@@ -147,7 +132,7 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
           </div>
 
           {/* Capacity dan Level */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1">
               <label className="text-sm font-semibold text-gray-700 ml-1">Kapasitas (L)</label>
               <input 
@@ -191,9 +176,9 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
             </div>
           )}
 
-          <div className="flex justify-end gap-3 pt-6">
-            <button type="button" onClick={onClose} className="px-8 py-2.5 text-sm font-semibold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">Batal</button>
-            <button type="submit" className="px-8 py-2.5 text-sm font-semibold bg-[#00D26A] text-white rounded-xl shadow-lg shadow-emerald-50 hover:bg-[#00b95d] active:scale-95 transition-all">
+          <div className="flex flex-col-reverse gap-3 pt-6 sm:flex-row sm:justify-end">
+            <button type="button" onClick={onClose} className="w-full rounded-xl border border-gray-200 bg-white px-8 py-2.5 text-sm font-semibold text-gray-500 transition-all hover:bg-gray-50 sm:w-auto">Batal</button>
+            <button type="submit" className="w-full rounded-xl bg-[#00D26A] px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-50 transition-all active:scale-95 hover:bg-[#00b95d] sm:w-auto">
               {editData ? 'Perbarui' : 'Tambah'} Bin
             </button>
           </div>

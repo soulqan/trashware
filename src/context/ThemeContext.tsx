@@ -10,25 +10,21 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [isDark, setIsDark] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') return false;
 
-  useEffect(() => {
-    // Check localStorage for saved preference
     const saved = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const shouldBeDark = saved ? saved === 'dark' : prefersDark;
-    
-    setIsDark(shouldBeDark);
-    setIsMounted(true);
-    
-    // Apply theme to HTML element
-    if (shouldBeDark) {
+    return saved ? saved === 'dark' : prefersDark;
+  });
+
+  useEffect(() => {
+    if (isDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, []);
+  }, [isDark]);
 
   const toggleTheme = () => {
     setIsDark((prev) => {
@@ -44,8 +40,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       return newIsDark;
     });
   };
-
-  if (!isMounted) return <>{children}</>;
 
   return (
     <ThemeContext.Provider value={{ isDark, toggleTheme }}>

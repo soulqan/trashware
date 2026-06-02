@@ -58,11 +58,11 @@ export default function HistoryView() {
     <div className="space-y-6 py-2">
       <h1 className="text-2xl font-bold text-gray-800">Analitik Bin</h1>
 
-      <section className="flex flex-wrap gap-4">
+      <section className="flex flex-col gap-4 lg:flex-row lg:flex-wrap">
         <select
           value={selectedLocation}
           onChange={(e) => setSelectedLocation(e.target.value)}
-          className="min-w-[280px] rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-emerald-400"
+          className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-emerald-400 lg:min-w-[280px]"
         >
           {LOCATION_OPTIONS.map((loc) => (
             <option key={loc} value={loc}>
@@ -78,7 +78,7 @@ export default function HistoryView() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         <article className="rounded-2xl border border-gray-200 bg-white p-7">
           <div className="mb-8 flex items-center justify-between">
             <p className="font-semibold text-gray-700">Rata-rata Kapasitas</p>

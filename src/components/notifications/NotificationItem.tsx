@@ -53,7 +53,7 @@ export default function NotificationItem({
   const IconComponent = styles.icon;
 
   return (
-    <div className="flex items-start gap-4 p-4 bg-white border-b border-gray-100 hover:bg-gray-50 transition">
+    <div className="flex flex-col gap-4 p-4 bg-white border-b border-gray-100 transition hover:bg-gray-50 sm:flex-row sm:items-start">
       {/* Icon */}
       <div className={`${styles.bgColor} p-3 rounded-full shrink-0 mt-1`}>
         <IconComponent className={`${styles.iconColor} text-lg`} />
@@ -74,12 +74,12 @@ export default function NotificationItem({
       {notification.status === 'baru' ? (
         <button
           onClick={() => onMarkAsRead(notification.id)}
-          className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition shrink-0"
+          className="w-full shrink-0 rounded-lg bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-600 sm:w-auto"
         >
           Baru
         </button>
       ) : (
-        <div className="px-4 py-1.5 bg-gray-200 text-gray-600 text-sm font-semibold rounded-lg shrink-0">
+        <div className="w-full shrink-0 rounded-lg bg-gray-200 px-4 py-1.5 text-sm font-semibold text-gray-600 sm:w-auto">
           Dibaca
         </div>
       )}

@@ -4,12 +4,19 @@ import { useState, useEffect } from "react";
 import { deriveNotificationService } from "@/lib/services/deriveNotificationService";
 import { useSearch } from "@/context/SearchContext";
 import { useSession } from "next-auth/react";
+import { FiMenu } from "react-icons/fi";
 
-export default function Navbar() {
+type NavbarProps = {
+  onMenuClick?: () => void;
+};
+
+export default function Navbar({ onMenuClick }: NavbarProps) {
   const router = useRouter();
   const [notificationCount, setNotificationCount] = useState(0);
   const { searchQuery, setSearchQuery } = useSearch();
   const { data: session } = useSession();
+  const userRole = session?.user?.role || "user";
+  const userName = session?.user?.name || "Loading...";
 
   // 1. Tentukan halaman mana yang SEARCH-nya mau DIHILANGKAN
   const hideSearchOn = ["/notifications", "/settings", "/profile", "/analytics"];
@@ -27,9 +34,23 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="h-20 bg-transparent flex items-center justify-between px-8">
+    <header className="flex flex-col gap-4 px-4 py-4 sm:px-6 lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      <div className="flex items-center justify-between gap-3 lg:hidden">
+        <button
+          onClick={onMenuClick || (() => {})}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:bg-gray-50"
+          aria-label="Buka menu"
+        >
+          <FiMenu />
+        </button>
+        <div className="min-w-0 flex-1 text-right">
+              <p className="truncate text-sm font-bold text-gray-800">{userName}</p>
+          <p className="text-xs capitalize text-gray-400">{userRole}</p>
+        </div>
+      </div>
+
       {/* Search Bar Group */}
-      <div className="relative w-96">
+      <div className="relative w-full lg:max-w-2xl">
         {/* 2. Gunakan Conditional Rendering */}
         {!shouldHideSearch ? (
           <>
@@ -41,7 +62,7 @@ export default function Navbar() {
               placeholder="Search bins, locations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border-none shadow-soft rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-emerald-500 transition-all outline-none"
+              className="w-full rounded-full border-none bg-white py-2.5 pl-12 pr-4 text-sm shadow-soft outline-none transition-all focus:ring-2 focus:ring-emerald-500"
             />
           </>
         ) : (
@@ -52,7 +73,7 @@ export default function Navbar() {
 
       {/* Sisi Kanan (Bell, Profile, dll) tetap muncul di semua page */}
       {/* Right Side Icons & Profile */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center justify-between gap-4 sm:justify-end lg:gap-6">
         <div className="flex items-center gap-4 text-gray-500">
           <button onClick={handleBellClick} className="relative hover:text-emerald-500 cursor-pointer transition-colors group">
             <FiBell size={20} />
@@ -65,11 +86,11 @@ export default function Navbar() {
         </div>
 
         {/* User Profile */}
-        <div className="flex items-center gap-3 border-l pl-6 border-gray-200">
+        <div className="flex items-center gap-3 border-l pl-4 sm:pl-6 border-gray-200">
           <button onClick={() => router.push("/profile")} className="flex items-center gap-3 hover:opacity-80 transition">
-            <div className="text-right">
-              <p className="text-sm font-bold text-gray-800">{session?.user?.name || "Loading..."}</p>
-              <p className="text-xs text-gray-400 capitalize">{(session as any)?.user?.role || "user"}</p>
+            <div className="hidden text-right sm:block">
+              <p className="text-sm font-bold text-gray-800">{userName}</p>
+              <p className="text-xs text-gray-400 capitalize">{userRole}</p>
             </div>
             {session?.user?.image ? (
               <img src={session.user.image} alt="avatar" className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />

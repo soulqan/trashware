@@ -6,9 +6,10 @@ import { collection, onSnapshot, query } from 'firebase/firestore';
 import { useSearch } from '@/context/SearchContext';
 import BinCard from '@/components/dashboard/BinCard';
 import { FiFilter, FiInfo } from 'react-icons/fi';
+import type { Bin } from '@/types/database';
 
 export default function MonitoringView() {
-  const [bins, setBins] = useState<any[]>([]);
+  const [bins, setBins] = useState<Bin[]>([]);
   const [loading, setLoading] = useState(true);
   const { searchQuery } = useSearch(); 
   
@@ -62,7 +63,7 @@ export default function MonitoringView() {
       />
 
       {/* Filter Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2 text-gray-500">
           <FiFilter className="text-emerald-500" />
           <span className="text-sm font-medium">Filter Tampilan:</span>
@@ -71,7 +72,7 @@ export default function MonitoringView() {
         <select 
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-gray-50 border-none text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-emerald-500 block w-full md:w-56 p-2.5 outline-none font-bold cursor-pointer transition-all"
+          className="w-full cursor-pointer rounded-xl border-none bg-gray-50 p-2.5 text-sm font-bold text-gray-700 outline-none transition-all focus:ring-2 focus:ring-emerald-500 md:w-56"
         >
           <option>Semua Status</option>
           <option>Penuh</option>
@@ -92,7 +93,7 @@ export default function MonitoringView() {
 
       {/* Grid Monitoring */}
       {filteredBins.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filteredBins.map((bin) => (
             <BinCard
               key={bin.firestoreId}

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { db } from "@/lib/firebase";
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, query, where, getDocs, type DocumentReference, type DocumentData } from "firebase/firestore";
 import bcrypt from "bcryptjs";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -20,8 +20,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { currentPassword, newPassword } = req.body;
 
     // Prefer using session user id (document id). If not available, try to find user doc by email.
-    const userId = (session.user as any).id;
-    let userDocRef;
+    const userId = (session.user as { id?: string }).id;
+    let userDocRef: DocumentReference<DocumentData>;
     if (userId) {
       userDocRef = doc(db, "users", userId);
     } else {

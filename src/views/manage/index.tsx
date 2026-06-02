@@ -49,7 +49,7 @@ export default function ManageView() {
   return (
     <PageContainer>
       {/* Header Section menggunakan PageHeader */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <PageHeader 
           title="Manage Bin" 
           subtitle="Monitoring infrastruktur dan status perangkat real-time" 
@@ -63,7 +63,7 @@ export default function ManageView() {
       </div>
 
       {/* Table Section */}
-      <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
+      <div className="hidden overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-sm sm:block">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead className="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest font-black text-left">
@@ -129,8 +129,73 @@ export default function ManageView() {
           )}
         </div>
       </div>
+
+      <div className="space-y-4 sm:hidden">
+        {filteredBins.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-gray-200 bg-white p-8 text-center text-gray-400 italic">
+            Data bin tidak ditemukan.
+          </div>
+        ) : (
+          filteredBins.map((bin) => {
+            const level = bin.level || 0;
+            const isOnline = bin.status === 'on';
+
+            return (
+              <div key={bin.firestoreId} className="rounded-3xl border border-gray-100 bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-emerald-600">{bin.id}</p>
+                    <h3 className="mt-1 text-base font-bold text-gray-800">{bin.gedung}</h3>
+                    <p className="text-sm text-gray-500">{bin.lantai} · {bin.ruang}</p>
+                  </div>
+                  <span className={`rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-widest border ${
+                    isOnline ? 'border-emerald-200 text-emerald-500 bg-emerald-50' : 'border-red-200 text-red-500 bg-red-50'
+                  }`}>
+                    {bin.status || 'OFF'}
+                  </span>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-2xl bg-gray-50 p-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Kapasitas</p>
+                    <p className="mt-1 font-bold text-gray-700">{bin.capacity}L</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Level</p>
+                    <p className="mt-1 font-bold text-gray-700">{level}%</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <span className={`rounded-xl px-3 py-1.5 text-[11px] font-bold text-white ${
+                    level >= 90 ? 'bg-[#FF3B30]' : 
+                    level >= 70 ? 'bg-[#FFCC00]' : 
+                    level > 0 ? 'bg-[#00D26A]' : 'bg-gray-400'
+                  }`}>
+                    {level >= 90 ? 'Penuh' : level >= 70 ? 'Hampir Penuh' : level > 0 ? 'Terisi' : 'Kosong'}
+                  </span>
+
+                  <div className="flex gap-1">
+                    <button onClick={() => { setSelectedBin(bin); setModalOpen(true); }} className="rounded-xl p-2 text-gray-400 transition-all hover:text-blue-500">
+                      <FiEdit2 size={16} />
+                    </button>
+                    <button onClick={() => handleDelete(bin.firestoreId!)} className="rounded-xl p-2 text-gray-400 transition-all hover:text-red-500">
+                      <FiTrash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
       
-      <ManageBin isOpen={isModalOpen} onClose={() => setModalOpen(false)} editData={selectedBin} />
+      <ManageBin
+        key={`${isModalOpen}-${selectedBin?.firestoreId || 'new'}`}
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        editData={selectedBin}
+      />
     </PageContainer>
   );
 }

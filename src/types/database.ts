@@ -1,3 +1,5 @@
+import type { Timestamp } from "firebase/firestore";
+
 export interface Bin {
   id: string;
   gedung: string;
@@ -6,7 +8,7 @@ export interface Bin {
   capacity: string | number;
   level: number;
   status: 'on' | 'off';
-  lastUpdate?: any;
+  lastUpdate?: Timestamp | Date | string | number | null;
 }
 
 export interface TrashHistory {
@@ -16,5 +18,5 @@ export interface TrashHistory {
   location: string;
   levelCaptured: number;
   status: 'Approved' | 'Rejected';
-  timestamp: any;
+  timestamp: Timestamp | Date | string | number;
 }

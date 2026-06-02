@@ -54,7 +54,7 @@ export default function DashboardView() {
       />
 
       {/* 1. StatCard */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <StatCard title="Total Bin" value={stats.total} textColor="text-gray-800" icon={<FiTrash2/>} />
         <StatCard title="Kosong" value={stats.empty} textColor="text-emerald-500" icon={<FiCheckCircle/>} />
         <StatCard title="Hampir Penuh" value={stats.nearlyFull} textColor="text-orange-400" icon={<FiAlertTriangle/>} />
@@ -106,7 +106,7 @@ export default function DashboardView() {
 
       {/* 4. Prioritas Pengambilan - Leaderboard */}
       <div className="mt-8">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
           <h2 className="text-lg font-black text-gray-800">Prioritas Pengambilan</h2>
           <p className="text-xs text-gray-400">Berdasarkan lamanya sampah penuh dan belum diambil</p>
         </div>
@@ -120,7 +120,7 @@ export default function DashboardView() {
             );
 
             return ranking.map((r, idx) => (
-              <div key={r.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-red-300 transition-all flex items-center gap-4">
+              <div key={r.id} className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:border-red-300 hover:shadow-md sm:flex-row sm:items-center">
                 {/* Rank Badge */}
                 <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-white text-lg flex-shrink-0 ${
                   idx === 0 ? 'bg-red-600' :
@@ -132,7 +132,7 @@ export default function DashboardView() {
                 </div>
 
                 {/* Location & Details */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="font-bold text-gray-800 text-sm">{r.location}</div>
                   <div className="text-xs text-gray-500 mt-1">ID: {r.binId}</div>
                   
@@ -166,7 +166,7 @@ export default function DashboardView() {
                 </div>
 
                 {/* Priority Label */}
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 self-start sm:self-auto">
                   <div className={`text-xs font-bold px-3 py-2 rounded-lg text-center ${
                     r.priorityLabel === 'High' ? 'bg-red-100 text-red-600' :
                     r.priorityLabel === 'Medium' ? 'bg-orange-100 text-orange-600' :
