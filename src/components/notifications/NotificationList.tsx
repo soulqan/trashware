@@ -36,7 +36,7 @@ export default function NotificationList({
   return (
     <div className="space-y-6">
       {/* Bagian Header yang diubah menggunakan PageHeader */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <PageHeader 
           title="Notifikasi" 
           subtitle={`${counts.baru} notifikasi belum dibaca`} 
@@ -45,7 +45,7 @@ export default function NotificationList({
         <button
           onClick={onMarkAllAsRead}
           disabled={counts.baru === 0}
-          className="px-4 py-2 border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 px-4 py-2 font-semibold text-gray-700 transition hover:border-gray-400 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span>✓</span>
           Tandai Semua Dibaca
@@ -53,12 +53,12 @@ export default function NotificationList({
       </div>
 
       {/* Filter Tabs - Tetap sesuai desain asli Anda */}
-      <div className="flex gap-3 bg-gray-100 p-2 rounded-2xl w-fit">
+      <div className="flex w-full gap-3 overflow-x-auto rounded-2xl bg-gray-100 p-2 sm:w-fit">
         {filterOptions.map((option) => (
           <button
             key={option.value}
             onClick={() => onFilterChange(option.value)}
-            className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition ${
+            className={`whitespace-nowrap rounded-xl px-6 py-2.5 text-sm font-semibold transition ${
               filter === option.value
                 ? 'bg-white text-gray-900 shadow-sm'
                 : 'bg-transparent text-gray-600 hover:text-gray-900'

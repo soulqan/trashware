@@ -11,17 +11,9 @@ export default function DashboardPage() {
     if (status === "unauthenticated") {
       router.push("/auth/login");
     }
-  }, [status]);
+  }, [status, router]);
 
   if (status === "loading") return <p>Loading...</p>;
 
-  return (
-    <div className="flex min-h-screen bg-white">
-      <div className="flex-1">
-        <main>
-          <DashboardView />
-        </main>
-      </div>
-    </div>
-  );
+  return <DashboardView />;
 }

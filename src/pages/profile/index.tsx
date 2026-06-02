@@ -3,11 +3,18 @@ import { useSession } from "next-auth/react";
 import ProfileModal from "@/components/profile/ProfileModal";
 import ChangePasswordModal from "@/components/profile/ChangePasswordModal";
 
+type ProfileShape = {
+  name?: string;
+  email?: string;
+  image?: string | null;
+  phone?: string | null;
+};
+
 export default function ProfilePage() {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<ProfileShape | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -38,17 +45,17 @@ export default function ProfilePage() {
   const profileData = profile || session?.user;
 
   return (
-    <div className="p-8">
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+    <div className="p-4 sm:p-8">
+      <div className="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-8">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div>
           </div>
         ) : (
           <>
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
               {profileData?.image ? (
-                <img src={profileData.image} className="w-24 h-24 rounded-full object-cover" />
+                <img src={profileData.image} alt="avatar" className="w-24 h-24 rounded-full object-cover" />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center text-3xl font-bold text-emerald-600">{(profileData?.name || "").split(" ").map((n:string)=>n[0]).slice(0,2).join("")}</div>
               )}
@@ -59,11 +66,11 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="mt-8 flex gap-3">
-              <button onClick={() => setOpen(true)} className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold text-sm hover:bg-emerald-700 transition-colors">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button onClick={() => setOpen(true)} className="rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-700">
                 Edit Profile
               </button>
-              <button onClick={() => setPasswordOpen(true)} className="px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors">
+              <button onClick={() => setPasswordOpen(true)} className="rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50">
                 Ganti Password
               </button>
             </div>

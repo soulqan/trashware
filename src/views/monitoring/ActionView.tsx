@@ -147,8 +147,8 @@ export default function ActionView({ id }: { id: string }) {
         subtitle="Verifikasi dilakukan otomatis melalui pencocokan data sensor IoT Trashware." 
       />
 
-      <div className="max-w-xl mx-auto mt-8 bg-white rounded-[40px] border border-gray-100 shadow-2xl overflow-hidden">
-        <div className="p-10 space-y-8">
+      <div className="mx-auto mt-8 max-w-xl overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl sm:rounded-[40px]">
+        <div className="space-y-6 p-5 sm:space-y-8 sm:p-10">
           
           {/* Section: Petugas */}
           <div className="flex items-center gap-4 p-5 bg-emerald-50 rounded-[24px] border border-emerald-100">
@@ -162,7 +162,7 @@ export default function ActionView({ id }: { id: string }) {
           </div>
 
           {/* Section: Level Comparison */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
             <div className="p-6 bg-gray-50 rounded-[24px] border border-gray-100">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                 <FiBarChart2 /> Level Awal
@@ -182,7 +182,7 @@ export default function ActionView({ id }: { id: string }) {
           </div>
 
           {/* Section: Lokasi */}
-          <div className="p-6 bg-white border-2 border-dashed border-gray-100 rounded-[24px]">
+          <div className="rounded-[24px] border-2 border-dashed border-gray-100 bg-white p-5 sm:p-6">
             <div className="flex items-center gap-2 mb-2 text-gray-400">
               <FiMapPin />
               <p className="text-[10px] font-bold uppercase tracking-widest">Titik Unit</p>
@@ -225,7 +225,7 @@ export default function ActionView({ id }: { id: string }) {
             )}
           </button>
 
-          <p className="text-center text-[10px] text-gray-400 font-bold px-6 uppercase tracking-tight">
+          <p className="px-2 text-center text-[10px] font-bold uppercase tracking-tight text-gray-400 sm:px-6">
             Verifikasi ini akan mencatat log aktivitas petugas dan memperbarui status pada dashboard admin.
           </p>
         </div>

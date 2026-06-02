@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import PageContainer from '@/components/layout/PageContainer'; 
-import PageHeader from '@/components/layout/PageHeader'; // Import PageHeader
 import { DerivedNotification } from '@/lib/services/deriveNotificationService';
 import { deriveNotificationService } from '@/lib/services/deriveNotificationService';
 import { notificationReadService } from '@/lib/services/notificationReadService';
@@ -24,8 +23,6 @@ export default function NotificationsView() {
 
   // Subscribe to derived notifications with read status
   useEffect(() => {
-    setLoading(true);
-    
     // Subscribe to notifications with status
     const unsubscribeNotifs = deriveNotificationService.subscribeToDerivedNotificationsWithStatus(
       (data) => {

@@ -70,7 +70,7 @@ export const deriveNotificationService = {
   subscribeToNotificationCounts(
     callback: (counts: { semua: number; baru: number; dibaca: number }) => void
   ) {
-    let binsData: any[] = [];
+    let binsData: Bin[] = [];
     let readIds: string[] = [];
 
     // Subscribe to bins
@@ -78,14 +78,17 @@ export const deriveNotificationService = {
       binsData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      })) as any[];
+      })) as Bin[];
 
       updateCounts();
     });
 
     // Subscribe to read notifications (real-time)
     const unsubscribeRead = onSnapshot(collection(db, 'notificationRead'), (snapshot) => {
-      readIds = snapshot.docs.map((doc) => doc.data().notificationId);
+      readIds = snapshot.docs
+        .map((doc) => doc.data() as { notificationId?: string })
+        .map((data) => data.notificationId)
+        .filter((id): id is string => Boolean(id));
       updateCounts();
     });
 

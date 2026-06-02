@@ -30,9 +30,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f2f7f9] flex items-center justify-center p-6 relative font-sans text-slate-800">
+    <div className="relative flex min-h-screen items-center justify-center bg-[#f2f7f9] p-4 font-sans text-slate-800 sm:p-6">
       {/* Container Utama */}
-      <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+      <div className="grid w-full max-w-5xl grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-24">
         {/* Kolom Kiri: Branding & Informasi */}
         <div className="flex flex-col">
           {/* Logo */}
@@ -66,7 +66,7 @@ export default function LoginPage() {
         </div>
 
         {/* Kolom Kanan: Form Login */}
-        <div className="w-full max-w-md mx-auto lg:ml-auto">
+        <div className="mx-auto w-full max-w-md lg:ml-auto">
           <div className="bg-white p-8 sm:p-10 rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50">
             <div className="mb-8">
               <h2 className="text-xl font-bold text-slate-900 mb-2">Login</h2>

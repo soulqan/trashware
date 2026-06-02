@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { db } from "@/lib/firebase";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, type DocumentReference, type DocumentData } from "firebase/firestore";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res);
@@ -11,8 +11,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Determine user document reference. Prefer session user id (doc id), else try to find by email.
-  const userId = (session.user as any).id;
-  let userDocRef;
+  const userId = (session.user as { id?: string }).id;
+  let userDocRef: DocumentReference<DocumentData>;
   if (userId) {
     userDocRef = doc(db, "users", userId);
   } else {

@@ -9,14 +9,14 @@ export default function BinCard({ id, gedung, lantai, ruang, level, capacity, st
   
   // Logika tema diletakkan SEBELUM return
 
-  const getLastUpdateLabel = (timestamp: any) => {
+  const getLastUpdateLabel = (timestamp: unknown) => {
     if (!timestamp) return 'Belum ada data';
     
-    // Jika timestamp berasal dari Firestore, kita perlu panggil .toDate()
     try {
-      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      const maybeTimestamp = timestamp as { toDate?: () => Date };
+      const date = maybeTimestamp.toDate ? maybeTimestamp.toDate() : new Date(timestamp as string | number | Date);
       return formatDistanceToNow(date, { addSuffix: true, locale: localeId });
-    } catch (e) {
+    } catch {
       return 'Baru saja';
     }
   };
@@ -40,21 +40,21 @@ export default function BinCard({ id, gedung, lantai, ruang, level, capacity, st
 
   return (
     <Link href={`/monitoring/${id}`}>
-      <div className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:border-emerald-300 transition-all cursor-pointer">
+      <div className="group cursor-pointer rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:border-emerald-300 sm:p-6">
         {/* Header: ID & Status Wifi */}
-        <div className="flex justify-between items-start mb-6">
+        <div className="mb-5 flex items-start justify-between gap-3 sm:mb-6">
           <div>
-            <h3 className="text-xl font-black text-gray-800 group-hover:text-emerald-600 transition-colors uppercase leading-none">
+            <h3 className="text-lg font-black uppercase leading-none text-gray-800 transition-colors group-hover:text-emerald-600 sm:text-xl">
               {id}
             </h3>
             <div className="flex items-center gap-1 text-gray-400 text-[10px] mt-2 font-medium">
               <FiMapPin size={10} className="shrink-0" />
-              <span className="truncate max-w-[150px]">{gedung} - {lantai}</span>
-            </div>
+            <span className="max-w-[180px] truncate sm:max-w-full">{gedung} - {lantai} {ruang ? `• ${ruang}` : ''}</span>
+          </div>
           </div>
           <div className="flex items-center gap-2">
             {isOnline ? <FiWifi className="text-green-400" size={16}/> : <FiWifiOff className="text-gray-300" size={16}/>}
-            <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase ${theme.bgLabel} ${theme.text}`}>
+            <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase ${theme.bgLabel} ${theme.text}`}>
               {theme.label}
             </span>
           </div>
@@ -64,7 +64,7 @@ export default function BinCard({ id, gedung, lantai, ruang, level, capacity, st
         <div className="space-y-2">
           <div className="flex justify-between items-end">
             <span className="text-xs text-gray-400 font-medium tracking-tight">Level Isi</span>
-            <span className={`text-xl font-black ${theme.text}`}>
+            <span className={`text-lg font-black sm:text-xl ${theme.text}`}>
               {isOnline ? `${level}%` : '--'}
             </span>
           </div>
@@ -83,7 +83,7 @@ export default function BinCard({ id, gedung, lantai, ruang, level, capacity, st
         </div>
 
         {/* Footer Card */}
-        <div className="mt-6 pt-4 border-t border-gray-50 flex justify-between items-center text-gray-400 text-[10px]">
+        <div className="mt-5 flex items-center justify-between border-t border-gray-50 pt-4 text-[10px] text-gray-400">
           <div className="flex items-center gap-1.5">
             <FiClock size={12} />
             <span>Update: {getLastUpdateLabel(lastUpdate)}</span>
@@ -96,4 +96,3 @@ export default function BinCard({ id, gedung, lantai, ruang, level, capacity, st
     </Link>
   );
 }
-

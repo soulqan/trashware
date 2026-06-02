@@ -1,8 +1,8 @@
-import { FiGrid, FiBarChart2, FiMapPin, FiBell, FiSettings, FiChevronLeft, FiTrash2 } from "react-icons/fi";
+import { FiGrid, FiBarChart2, FiMapPin, FiBell, FiTrash2 } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FiLogOut } from "react-icons/fi";
-import { useSession } from "next-auth/react";
+import { FiLogOut, FiX } from "react-icons/fi";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 
 const menuItems = [
@@ -15,44 +15,50 @@ const menuItems = [
 
 type Role = "admin" | "petugas";
 
-export default function Sidebar() {
+type SidebarProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const router = useRouter();
 
   const { data: session } = useSession();
   const role = (session?.user as { role?: Role })?.role;
 
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // hapus token login
-    router.push("auth/login"); // arahkan ke halaman login
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/auth/login" });
   };
 
   return (
-    <div className="h-screen w-64 bg-white border-r border-gray-100 flex flex-col justify-between p-4 sticky top-0">
-      <div>
-        {/* Logo Section */}
-
-        <div className="flex items-center gap-1 px-2 mb-10">
-          {/* <div className="bg-emerald-500 p-2 rounded-xl"> */}
-          <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={50} height={50} className="object-contain" />
-          {/* </div> */}
-
-          <div>
-            <h2 className="text-lg font-bold text-gray-800 leading-tight">TrashWare</h2>
-            <p className="text-[10px] text-gray-400 font-medium tracking-widest uppercase">IoT Monitoring</p>
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 flex h-full w-72 flex-col justify-between border-r border-gray-100 bg-white p-4 shadow-2xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-64 lg:shadow-none ${
+        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      }`}
+    >
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="mb-8 flex items-center justify-between gap-3 px-2">
+          <div className="flex items-center gap-1">
+            <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={50} height={50} className="object-contain" />
+            <div>
+              <h2 className="text-lg font-bold leading-tight text-gray-800">TrashWare</h2>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-gray-400">IoT Monitoring</p>
+            </div>
           </div>
+
+          <button onClick={onClose} className="rounded-full p-2 text-gray-400 transition hover:bg-gray-50 hover:text-gray-700 lg:hidden">
+            <FiX size={18} />
+          </button>
         </div>
 
-        {/* Menu Items */}
-        <nav className="space-y-1">
+        <nav className="space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
-            // kalau role tidak sesuai → tidak tampil
             if (!role || !item.role.includes(role)) return null;
-            // if (!item.role.includes(session?.user?.role)) return null;
 
             return (
-              <Link key={item.path} href={item.path}>
+              <Link key={item.path} href={item.path} onClick={onClose}>
                 <div
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3 cursor-pointer transition-all ${
                     router.pathname === item.path ? "bg-emerald-50 text-emerald-600 font-semibold" : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
                   }`}
                 >
@@ -65,19 +71,12 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Bottom Section */}
       <div className="space-y-1 border-t border-gray-50 pt-4">
-        {/* <Link href="/settings">
-          <div className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 rounded-xl cursor-pointer">
-            <FiSettings />
-            <span className="text-sm">Settings</span>
-          </div>
-        </Link> */}
-        <div onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 text-white bg-red-500 hover:bg-red-600 rounded-xl cursor-pointer">
+        <div onClick={handleLogout} className="flex cursor-pointer items-center gap-3 rounded-xl bg-red-500 px-4 py-3 text-white transition hover:bg-red-600">
           <FiLogOut />
           <span className="text-sm">Logout</span>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }

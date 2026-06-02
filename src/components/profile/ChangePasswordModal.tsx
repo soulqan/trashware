@@ -64,7 +64,7 @@ export default function ChangePasswordModal({ open, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px] p-4">
-      <div className="bg-white w-full max-w-md rounded-[24px] shadow-2xl p-8">
+      <div className="w-full max-w-md rounded-[24px] bg-white p-6 shadow-2xl sm:p-8">
         <h2 className="text-xl font-bold text-gray-800 mb-6">Ganti Password</h2>
 
         {success ? (
@@ -110,18 +110,18 @@ export default function ChangePasswordModal({ open, onClose }: Props) {
               />
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-colors"
+                className="rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
               >
                 Batal
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 disabled:opacity-50 transition-all"
+                className="rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-emerald-700 disabled:opacity-50"
               >
                 {loading ? "Mengubah..." : "Ganti Password"}
               </button>
