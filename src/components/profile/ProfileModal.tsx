@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 type Props = {
   open: boolean;
@@ -7,6 +8,7 @@ type Props = {
 };
 
 export default function ProfileModal({ open, onClose, onSave }: Props) {
+  const { update } = useSession();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -57,6 +59,7 @@ export default function ProfileModal({ open, onClose, onSave }: Props) {
       
       // Wait for onSave callback to complete before closing
       await onSave?.();
+      await update({ name });
       
       onClose();
     } catch (err) {

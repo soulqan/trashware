@@ -78,7 +78,14 @@ export default NextAuth({
 
   callbacks: {
     // 🔥 simpan user ke token
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
+  if (trigger === "update" && session) {
+    const updatedName = session.name ?? session.user?.name;
+    if (updatedName) {
+      token.name = updatedName;
+    }
+  }
+
   // login credentials
   if (user) {
     token.id = user.id;
@@ -138,6 +145,8 @@ return token;
   async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
         session.user.role = token.role as string;
       }
       return session;
