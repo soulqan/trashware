@@ -55,14 +55,14 @@ export default function HistoryView() {
   if (loading) return <div className="py-8 text-center text-gray-500">Memuat log riwayat sampah...</div>;
 
   return (
-    <div className="space-y-6 py-2">
-      <h1 className="text-2xl font-bold text-gray-800">Analitik Bin</h1>
+    <div className="space-y-3 py-1 sm:space-y-6 sm:py-2">
+      <h1 className="text-xl font-bold text-gray-800 sm:text-2xl">Analitik Bin</h1>
 
-      <section className="flex flex-col gap-4 lg:flex-row lg:flex-wrap">
+      <section className="flex flex-col gap-2 sm:gap-4 lg:flex-row lg:flex-wrap">
         <select
           value={selectedLocation}
           onChange={(e) => setSelectedLocation(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-emerald-400 lg:min-w-[280px]"
+          className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-[11px] text-gray-700 outline-none transition focus:border-emerald-400 sm:py-2.5 sm:text-sm lg:min-w-[280px]"
         >
           {LOCATION_OPTIONS.map((loc) => (
             <option key={loc} value={loc}>
@@ -71,76 +71,76 @@ export default function HistoryView() {
           ))}
         </select>
 
-        <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-[11px] text-gray-600 sm:text-xs">
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="bg-transparent outline-none" />
           <span>sampai</span>
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-transparent outline-none" />
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <article className="rounded-2xl border border-gray-200 bg-white p-7">
-          <div className="mb-8 flex items-center justify-between">
+      <section className="grid grid-cols-2 gap-2 sm:gap-4 xl:grid-cols-3">
+        <article className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-7">
+          <div className="mb-4 flex items-center justify-between sm:mb-8">
             <p className="font-semibold text-gray-700">Rata-rata Kapasitas</p>
             <FiBarChart2 className="text-emerald-500" size={28} />
           </div>
-          <p className="text-5xl font-bold text-gray-900">{chartData.length > 0 ? chartData[chartData.length - 1].avg : 0}%</p>
-          <p className="mt-2 text-sm text-gray-600">Berdasarkan data filter terakhir</p>
+          <p className="text-3xl font-bold text-gray-900 sm:text-5xl">{chartData.length > 0 ? chartData[chartData.length - 1].avg : 0}%</p>
+          <p className="mt-1.5 text-xs text-gray-600 sm:mt-2 sm:text-sm">Berdasarkan data filter terakhir</p>
         </article>
 
-        <article className="rounded-2xl border border-gray-200 bg-white p-7">
-          <div className="mb-8 flex items-center justify-between">
+        <article className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-7">
+          <div className="mb-4 flex items-center justify-between sm:mb-8">
             <p className="font-semibold text-gray-700">Total Aktivitas</p>
             <FiList className="text-blue-500" size={28} />
           </div>
-          <p className="text-5xl font-bold text-gray-900">{filteredRecords.length}</p>
-          <p className="mt-2 text-sm text-gray-600">Jumlah log yang tercatat</p>
+          <p className="text-3xl font-bold text-gray-900 sm:text-5xl">{filteredRecords.length}</p>
+          <p className="mt-1.5 text-xs text-gray-600 sm:mt-2 sm:text-sm">Jumlah log yang tercatat</p>
         </article>
 
-        <article className="rounded-2xl border border-gray-200 bg-white p-7">
-          <div className="mb-8 flex items-center justify-between">
+        <article className="col-span-2 rounded-2xl border border-gray-200 bg-white p-4 xl:col-span-1 sm:p-7">
+          <div className="mb-4 flex items-center justify-between sm:mb-8">
             <p className="font-semibold text-gray-700">Log Terbaru</p>
             <FiMapPin className="text-amber-500" size={28} />
           </div>
-          <p className="text-2xl font-bold text-gray-900">{latestRecord ? latestRecord.location : '-'}</p>
-          <p className="mt-2 text-sm text-gray-600">{latestRecord ? `BIN: ${shortenId(latestRecord.binId)}` : 'BIN: -'}</p>
+          <p className="text-xl font-bold text-gray-900 sm:text-2xl">{latestRecord ? latestRecord.location : '-'}</p>
+          <p className="mt-1.5 text-xs text-gray-600 sm:mt-2 sm:text-sm">{latestRecord ? `BIN: ${shortenId(latestRecord.binId)}` : 'BIN: -'}</p>
         </article>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <article className="rounded-2xl border border-gray-200 bg-white p-7">
+      <section className="grid grid-cols-1 gap-2 sm:gap-4 lg:grid-cols-2">
+        <article className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-7">
           <p className="font-semibold text-gray-700">Jam Sibuk</p>
-          <p className="mt-3 text-3xl font-bold text-gray-900">{peakHour ? peakHour.label : '-'}</p>
-          <p className="mt-2 text-sm text-gray-600">{peakHour ? `${peakHour.count} log pada jam ini` : 'Belum ada data log'}</p>
+          <p className="mt-2 text-2xl font-bold text-gray-900 sm:mt-3 sm:text-3xl">{peakHour ? peakHour.label : '-'}</p>
+          <p className="mt-1.5 text-xs text-gray-600 sm:mt-2 sm:text-sm">{peakHour ? `${peakHour.count} log pada jam ini` : 'Belum ada data log'}</p>
         </article>
 
-        <article className="rounded-2xl border border-gray-200 bg-white p-7">
+        <article className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-7">
           <p className="font-semibold text-gray-700">Top Lokasi Sering Penuh</p>
           {topFullLocations.length > 0 ? (
             <div className="mt-4 space-y-3">
               {topFullLocations.map((item, index) => (
-                <div key={item.location} className="flex items-center justify-between rounded-xl bg-amber-50 px-4 py-3">
-                  <p className="text-sm font-medium text-gray-800">
+                <div key={item.location} className="flex items-center justify-between rounded-xl bg-amber-50 px-3 py-2.5 sm:px-4 sm:py-3">
+                  <p className="text-xs font-medium text-gray-800 sm:text-sm">
                     {index + 1}. {item.location}
                   </p>
-                  <p className="text-sm font-bold text-amber-700">{item.count}x</p>
+                  <p className="text-xs font-bold text-amber-700 sm:text-sm">{item.count}x</p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="mt-3 text-sm text-gray-600">Belum ada lokasi dengan kapasitas {FULL_THRESHOLD}% ke atas.</p>
+            <p className="mt-2 text-xs text-gray-600 sm:mt-3 sm:text-sm">Belum ada lokasi dengan kapasitas {FULL_THRESHOLD}% ke atas.</p>
           )}
         </article>
       </section>
 
-      <section className="rounded-2xl border border-gray-200 bg-white p-7">
-        <h2 className="mb-6 text-2xl font-bold text-gray-800">Tren Kapasitas Sampah</h2>
+      <section className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-7">
+        <h2 className="mb-3 text-lg font-bold text-gray-800 sm:mb-6 sm:text-2xl">Tren Kapasitas Sampah</h2>
         <TrendChart chartData={chartData} chartPoints={chartPoints} />
       </section>
 
-      <section className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 text-emerald-800">
-        <h3 className="mb-2 text-lg font-bold">Tentang Dashboard Analitik</h3>
-        <p className="text-sm leading-relaxed">
+      <section className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3 text-emerald-800 sm:p-6">
+        <h3 className="mb-2 text-base font-bold sm:text-lg">Tentang Dashboard Analitik</h3>
+        <p className="text-xs leading-relaxed sm:text-sm">
           Dashboard ini menampilkan analisis real-time pengisian sampah di seluruh lokasi. Gunakan filter <strong>lokasi</strong> dan <strong>tanggal</strong> untuk melihat metrik spesifik. 
           Pantau <strong>Jam Sibuk</strong> untuk mengetahui periode puncak pengumpulan, dan <strong>Top Lokasi Sering Penuh</strong> untuk prioritas pengangkutan. Grafik tren membantu merencanakan jadwal maintenance yang lebih efisien.
         </p>

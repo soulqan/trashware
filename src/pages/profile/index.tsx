@@ -45,32 +45,32 @@ export default function ProfilePage() {
   const profileData = profile || session?.user;
 
   return (
-    <div className="p-4 sm:p-8">
-      <div className="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-5 shadow-sm sm:p-8">
+    <div className="p-3 sm:p-6">
+      <div className="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div>
           </div>
         ) : (
           <>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
               {profileData?.image ? (
-                <img src={profileData.image} alt="avatar" className="w-24 h-24 rounded-full object-cover" />
+                <img src={profileData.image} alt="avatar" className="w-20 h-20 rounded-full object-cover sm:h-24 sm:w-24" />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center text-3xl font-bold text-emerald-600">{(profileData?.name || "").split(" ").map((n:string)=>n[0]).slice(0,2).join("")}</div>
+                <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-2xl font-bold text-emerald-600 sm:h-24 sm:w-24 sm:text-3xl">{(profileData?.name || "").split(" ").map((n:string)=>n[0]).slice(0,2).join("")}</div>
               )}
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">{profileData?.name}</h2>
-                <p className="text-sm text-gray-500 mt-1">{profileData?.email}</p>
-                {profileData?.phone && <p className="text-sm text-gray-500">Telepon: {profileData.phone}</p>}
+                <h2 className="text-xl font-bold text-gray-800 sm:text-2xl">{profileData?.name}</h2>
+                <p className="text-xs text-gray-500 mt-0.5 sm:mt-1 sm:text-sm">{profileData?.email}</p>
+                {profileData?.phone && <p className="text-xs text-gray-500 sm:text-sm">Telepon: {profileData.phone}</p>}
               </div>
             </div>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button onClick={() => setOpen(true)} className="rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-700">
+            <div className="mt-6 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:gap-3">
+              <button onClick={() => setOpen(true)} className="rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-700 sm:px-6 sm:py-3 sm:text-sm">
                 Edit Profile
               </button>
-              <button onClick={() => setPasswordOpen(true)} className="rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50">
+              <button onClick={() => setPasswordOpen(true)} className="rounded-xl border border-gray-200 px-4 py-2.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 sm:px-6 sm:py-3 sm:text-sm">
                 Ganti Password
               </button>
             </div>

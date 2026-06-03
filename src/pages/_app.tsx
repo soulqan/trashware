@@ -33,7 +33,7 @@ export default function App({ Component, pageProps }: AppProps) {
             )}
             <div className="flex min-w-0 flex-1 flex-col">
               <Navbar onMenuClick={() => setIsMobileNavOpen(true)} />
-              <main className="min-w-0 px-4 pb-6 sm:px-6 lg:px-8 lg:pb-8">
+              <main className="min-w-0 px-2 pb-3 sm:px-5 sm:pb-6 lg:px-8 lg:pb-8">
                 <Component {...pageProps} />
               </main>
             </div>

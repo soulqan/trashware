@@ -63,16 +63,16 @@ export default function MonitoringView() {
       />
 
       {/* Filter Bar */}
-      <div className="flex flex-col gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 bg-white p-2.5 rounded-2xl border border-gray-100 shadow-sm md:flex-row md:items-center md:justify-between sm:gap-3 sm:p-4">
         <div className="flex items-center gap-2 text-gray-500">
           <FiFilter className="text-emerald-500" />
-          <span className="text-sm font-medium">Filter Tampilan:</span>
+          <span className="text-xs font-medium sm:text-sm">Filter Tampilan:</span>
         </div>
 
         <select 
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full cursor-pointer rounded-xl border-none bg-gray-50 p-2.5 text-sm font-bold text-gray-700 outline-none transition-all focus:ring-2 focus:ring-emerald-500 md:w-56"
+          className="w-full cursor-pointer rounded-xl border-none bg-gray-50 p-2 text-[11px] font-bold text-gray-700 outline-none transition-all focus:ring-2 focus:ring-emerald-500 sm:p-2.5 sm:text-sm md:w-56"
         >
           <option>Semua Status</option>
           <option>Penuh</option>
@@ -84,16 +84,16 @@ export default function MonitoringView() {
       </div>
 
       {/* Stats Info */}
-      <div className="flex items-center gap-2 px-2">
+      <div className="flex items-center gap-2 px-1">
         <FiInfo className="text-gray-400" size={14} />
-        <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">
+        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider sm:text-[11px]">
           Menampilkan {filteredBins.length} dari {bins.length} tempat sampah
         </p>
       </div>
 
       {/* Grid Monitoring */}
       {filteredBins.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
           {filteredBins.map((bin) => (
             <BinCard
               key={bin.firestoreId}
@@ -108,7 +108,7 @@ export default function MonitoringView() {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-3xl p-20 text-center border border-dashed border-gray-200">
+        <div className="bg-white rounded-3xl p-6 text-center border border-dashed border-gray-200 sm:p-20">
           <p className="text-gray-400 italic">Tidak ada tempat sampah yang cocok dengan filter ini.</p>
         </div>
       )}
