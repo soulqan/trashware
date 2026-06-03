@@ -137,7 +137,7 @@ export default function ActionView({ id }: { id: string }) {
     <PageContainer>
       <button 
         onClick={() => router.back()} 
-        className="flex items-center gap-2 text-gray-500 mb-6 font-bold text-sm hover:text-gray-900 transition-colors"
+        className="flex items-center gap-2 text-gray-500 mb-3 font-bold text-xs hover:text-gray-900 transition-colors sm:mb-6 sm:text-sm"
       >
         <FiArrowLeft /> Kembali
       </button>
@@ -147,63 +147,63 @@ export default function ActionView({ id }: { id: string }) {
         subtitle="Verifikasi dilakukan otomatis melalui pencocokan data sensor IoT Trashware." 
       />
 
-      <div className="mx-auto mt-8 max-w-xl overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl sm:rounded-[40px]">
-        <div className="space-y-6 p-5 sm:space-y-8 sm:p-10">
+      <div className="mx-auto mt-4 max-w-xl overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl sm:mt-8 sm:rounded-[40px]">
+        <div className="space-y-3 p-3.5 sm:space-y-6 sm:p-8 lg:p-10">
           
           {/* Section: Petugas */}
-          <div className="flex items-center gap-4 p-5 bg-emerald-50 rounded-[24px] border border-emerald-100">
-            <div className="w-14 h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200">
+          <div className="flex items-center gap-2.5 p-3 bg-emerald-50 rounded-2xl border border-emerald-100 sm:gap-4 sm:p-5 sm:rounded-[24px]">
+            <div className="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200 sm:h-14 sm:w-14 sm:rounded-2xl">
               <FiUser size={28} />
             </div>
             <div>
-              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Petugas Penjemputan</p>
-              <p className="font-extrabold text-gray-800 text-lg">{session?.user?.name || 'Loading...'}</p>
+              <p className="text-[9px] font-black text-emerald-600 uppercase tracking-[0.2em] sm:text-[10px]">Petugas Penjemputan</p>
+              <p className="font-extrabold text-gray-800 text-base sm:text-lg">{session?.user?.name || 'Loading...'}</p>
             </div>
           </div>
 
           {/* Section: Level Comparison */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-            <div className="p-6 bg-gray-50 rounded-[24px] border border-gray-100">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:gap-6">
+            <div className="p-3 bg-gray-50 rounded-2xl border border-gray-100 sm:p-6 sm:rounded-[24px]">
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2 sm:text-[10px]">
                 <FiBarChart2 /> Level Awal
               </p>
-              <p className="font-black text-2xl text-gray-400 tracking-tighter">
+              <p className="font-black text-lg text-gray-400 tracking-tighter sm:text-2xl">
                 {initialLevel !== null ? `${initialLevel}%` : '--%'}
               </p>
             </div>
-            <div className="p-6 bg-emerald-50/30 rounded-[24px] border border-emerald-100/50">
-              <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2 flex items-center gap-2">
+            <div className="p-3 bg-emerald-50/30 rounded-2xl border border-emerald-100/50 sm:p-6 sm:rounded-[24px]">
+              <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest mb-2 flex items-center gap-2 sm:text-[10px]">
                 <FiBarChart2 /> Real-time
               </p>
-              <p className={`font-black text-2xl tracking-tighter ${binData && binData.level < 20 ? 'text-emerald-500' : 'text-orange-500'}`}>
+              <p className={`font-black text-lg tracking-tighter sm:text-2xl ${binData && binData.level < 20 ? 'text-emerald-500' : 'text-orange-500'}`}>
                 {binData ? `${binData.level}%` : '--%'}
               </p>
             </div>
           </div>
 
           {/* Section: Lokasi */}
-          <div className="rounded-[24px] border-2 border-dashed border-gray-100 bg-white p-5 sm:p-6">
+          <div className="rounded-2xl border-2 border-dashed border-gray-100 bg-white p-3 sm:p-6 sm:rounded-[24px]">
             <div className="flex items-center gap-2 mb-2 text-gray-400">
               <FiMapPin />
-              <p className="text-[10px] font-bold uppercase tracking-widest">Titik Unit</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest sm:text-[10px]">Titik Unit</p>
             </div>
             <p className="font-bold text-gray-700">
               {binData ? `${binData.gedung}, ${binData.lantai}` : 'Memuat lokasi...'}
             </p>
-            <p className="text-sm text-gray-400 font-medium italic">
+            <p className="text-xs text-gray-400 font-medium italic sm:text-sm">
               {binData?.ruang || 'Mencari detail ruang...'}
             </p>
           </div>
 
           {/* Feedback Messages */}
           {message && (
-            <div className={`p-5 rounded-2xl flex items-start gap-4 animate-in fade-in zoom-in duration-300 ${
+            <div className={`p-4 rounded-2xl flex items-start gap-3 animate-in fade-in zoom-in duration-300 sm:p-5 sm:gap-4 ${
               message.type === 'success' 
                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
                 : 'bg-red-50 text-red-700 border border-red-100'
             }`}>
               {message.type === 'success' ? <FiCheckCircle size={20} className="mt-1 shrink-0" /> : <FiAlertCircle size={20} className="mt-1 shrink-0" />}
-              <p className="text-sm font-black leading-tight">{message.text}</p>
+              <p className="text-xs font-black leading-tight sm:text-sm">{message.text}</p>
             </div>
           )}
 
@@ -211,7 +211,7 @@ export default function ActionView({ id }: { id: string }) {
           <button
             onClick={handleApproveAction}
             disabled={isButtonDisabled}
-            className={`w-full py-6 rounded-[28px] font-black text-xl flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl
+            className={`w-full py-3 rounded-2xl font-black text-base flex items-center justify-center gap-2.5 transition-all active:scale-95 shadow-xl sm:py-6 sm:text-xl sm:rounded-[28px] sm:gap-3
               ${isButtonDisabled && !message
                 ? 'bg-gray-100 text-gray-300 cursor-not-allowed shadow-none' 
                 : 'bg-gray-900 hover:bg-black text-white shadow-gray-200'}`}
@@ -225,7 +225,7 @@ export default function ActionView({ id }: { id: string }) {
             )}
           </button>
 
-          <p className="px-2 text-center text-[10px] font-bold uppercase tracking-tight text-gray-400 sm:px-6">
+          <p className="px-2 text-center text-[9px] font-bold uppercase tracking-tight text-gray-400 sm:px-6 sm:text-[10px]">
             Verifikasi ini akan mencatat log aktivitas petugas dan memperbarui status pada dashboard admin.
           </p>
         </div>
