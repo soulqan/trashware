@@ -19,7 +19,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   const userName = session?.user?.name || "Loading...";
 
   // 1. Tentukan halaman mana yang SEARCH-nya mau DIHILANGKAN
-  const hideSearchOn = ["/notifications", "/settings", "/profile", "/analytics"];
+  const hideSearchOn = ["/notifications", "/settings", "/profile"];
   const shouldHideSearch = hideSearchOn.includes(router.pathname);
 
   const handleBellClick = () => {
@@ -34,52 +34,65 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   }, []);
 
   return (
-    <header className="grid grid-cols-[auto,1fr,auto] items-center gap-2 px-2 py-2 sm:gap-4 sm:px-5 sm:py-4 lg:h-20 lg:flex lg:flex-row lg:items-center lg:justify-between lg:px-8">
-      <div className="col-span-2 flex items-center justify-between gap-1.5 sm:gap-2">
+    <header className="flex items-center gap-1 px-2 py-2 sm:gap-3 sm:px-5 sm:py-4 lg:h-20 lg:px-8 lg:gap-6">
+      {/* Menu Button - Mobile Only */}
+      <div className="flex sm:hidden flex-shrink-0">
         <button
           onClick={onMenuClick || (() => {})}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:bg-gray-50 sm:h-10 sm:w-10 sm:rounded-xl"
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:bg-gray-50"
           aria-label="Buka menu"
         >
           <FiMenu />
         </button>
-        <div className="flex items-center gap-4 text-gray-500">
-          <button onClick={handleBellClick} className="relative hover:text-emerald-500 cursor-pointer transition-colors group">
-            <FiBell size={20} />
-            {notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-[#F9FAFB] font-bold group-hover:bg-red-600 transition-colors">
-                {notificationCount > 9 ? "9+" : notificationCount}
-              </span>
-            )}
-          </button>
-        </div>
       </div>
 
-      {/* Search Bar Group */}
-      <div className="col-span-full row-start-2 relative w-full mt-1 sm:mt-0 lg:row-start-auto lg:col-span-auto lg:max-w-2xl">
-        {/* 2. Gunakan Conditional Rendering */}
+      {/* Search Bar Group - Mobile and Desktop */}
+      <div className="flex items-center gap-1 sm:gap-2 flex-1 sm:flex-1 sm:max-w-4xl">
         {!shouldHideSearch ? (
           <>
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 sm:left-4">
-              <FiSearch />
-            </span>
-            <input
-              type="text"
-              placeholder="Search bins, locations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-full border-none bg-white py-1.5 pl-9 pr-2 text-[11px] shadow-soft outline-none transition-all focus:ring-2 focus:ring-emerald-500 sm:py-2.5 sm:pl-12 sm:pr-4 sm:text-sm"
-            />
+            <div className="flex-1 relative">
+              <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 sm:left-4">
+                <FiSearch />
+              </span>
+              <input
+                type="text"
+                placeholder="Search bins, locations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-full border-none bg-white py-1.5 pl-9 pr-2 text-[11px] shadow-soft outline-none transition-all focus:ring-2 focus:ring-emerald-500 sm:py-2.5 sm:pl-12 sm:pr-4 sm:text-sm"
+              />
+            </div>
+            {/* Bell Icon Mobile - di sebelah kanan search */}
+            <button onClick={handleBellClick} className="flex sm:hidden relative hover:text-emerald-500 cursor-pointer transition-colors group items-center justify-center text-gray-500">
+              <FiBell size={20} />
+              {notificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-[#F9FAFB] font-bold group-hover:bg-red-600 transition-colors">
+                  {notificationCount > 9 ? "9+" : notificationCount}
+                </span>
+              )}
+            </button>
           </>
         ) : (
-          /* Bisa dikosongkan atau ganti jadi Breadcrumb/Judul Kecil */
-          <div className="h-9 sm:h-10"></div>
+          /* Hidden Search - Show empty space or nothing */
+          <div className="hidden"></div>
         )}
       </div>
 
-      {/* Sisi Kanan (Bell, Profile, dll) tetap muncul di semua page */}
-      {/* Right Side Icons & Profile */}
-      <div className="col-start-3 row-start-1 flex items-center justify-end gap-1.5 sm:gap-4 lg:gap-6">
+      {/* Spacer for desktop - pushes right side to the right */}
+      <div className="hidden sm:flex flex-1"></div>
+
+      {/* Right Side - Bell and Profile - Always on Right */}
+      <div className="flex items-center justify-end gap-1 sm:gap-4 lg:gap-6 flex-shrink-0">
+        {/* Notification Icon Desktop Only */}
+        <button onClick={handleBellClick} className="hidden sm:flex relative hover:text-emerald-500 cursor-pointer transition-colors group items-center justify-center text-gray-500">
+          <FiBell size={20} />
+          {notificationCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-[#F9FAFB] font-bold group-hover:bg-red-600 transition-colors">
+              {notificationCount > 9 ? "9+" : notificationCount}
+            </span>
+          )}
+        </button>
+        
         {/* User Profile */}
         <div className="flex items-center gap-1.5 border-l pl-2 sm:gap-3 sm:pl-6 border-gray-200">
           <button onClick={() => router.push("/profile")} className="flex items-center gap-3 hover:opacity-80 transition">
