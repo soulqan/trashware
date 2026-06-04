@@ -31,7 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
                 className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
               />
             )}
-            <div className="flex min-w-0 flex-1 flex-col">
+            <div className="flex min-w-0 flex-1 flex-col lg:ml-64">
               <Navbar onMenuClick={() => setIsMobileNavOpen(true)} />
               <main className="min-w-0 px-2 pb-3 sm:px-5 sm:pb-6 lg:px-8 lg:pb-8">
                 <Component {...pageProps} />

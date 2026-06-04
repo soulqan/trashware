@@ -9,7 +9,7 @@ const menuItems = [
   { name: "Dashboard", icon: <FiGrid />, path: "/", role: ["admin", "petugas"] },
   { name: "Monitoring", icon: <FiTrash2 />, path: "/monitoring", role: ["admin", "petugas"] },
   { name: "Manage Bin", icon: <FiMapPin />, path: "/manage", role: ["admin"] }, // hanya admin
-  { name: "Analytics", icon: <FiBarChart2 />, path: "/analytics", role: ["admin", "petugas"] },
+  // { name: "Analytics", icon: <FiBarChart2 />, path: "/analytics", role: ["admin", "petugas"] },
   { name: "Notifications", icon: <FiBell />, path: "/notifications", role: ["admin", "petugas"] },
 ];
 
@@ -32,7 +32,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex h-full w-56 flex-col justify-between border-r border-gray-100 bg-white p-2.5 shadow-2xl transition-transform duration-300 sm:w-72 sm:p-4 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-64 lg:shadow-none ${
+      className={`fixed inset-y-0 left-0 z-40 flex h-full w-56 flex-col justify-between border-r border-gray-100 bg-white p-2.5 shadow-2xl transition-transform duration-300 sm:w-72 sm:p-4 lg:z-30 lg:h-screen lg:w-64 lg:shadow-none ${
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       }`}
     >

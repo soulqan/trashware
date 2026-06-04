@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { updateDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { FiX } from 'react-icons/fi';
@@ -25,6 +25,25 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
     status: 'on'
   });
   const [error, setError] = useState<string | null>(null);
+
+  // Populate form data ketika editData berubah
+  useEffect(() => {
+    if (editData) {
+      setFormData(editData);
+    } else {
+      // Reset form untuk create baru
+      setFormData({
+        id: "",
+        gedung: "",
+        lantai: "",
+        ruang: "",
+        capacity: 0,
+        level: 0,
+        status: 'on'
+      });
+    }
+    setError(null);
+  }, [editData, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
