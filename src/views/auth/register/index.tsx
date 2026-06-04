@@ -34,45 +34,51 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#f2f7f9] p-4 font-sans text-slate-800 sm:p-6">
-      <div className="grid w-full max-w-5xl grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-24">
+    <div className="relative flex min-h-screen items-start lg:items-center justify-center bg-[#f2f7f9] px-4 py-6 sm:p-6 font-sans text-slate-800 overflow-hidden">
+      <div className="grid w-full max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-24">
         {/* KIRI (SAMA PERSIS LOGIN) */}
         <div className="flex flex-col">
-          {/* Logo */}
-          <div className="flex items-center gap-4 mb-10">
-            {/* <div className="bg-[#ffffff] p-3 rounded-2xl flex items-center justify-center shadow-sm"> */}
-            <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={80} height={80} className="object-contain" />
-            {/* </div> */}
+          {/* Logo tetap tampil */}
+          <div className="flex items-center gap-3 mb-0 md:mb-6 ">
+            <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={72} height={72} className="object-contain w-14 h-14 md:w-20 md:h-20" />
+
             <div>
-              <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Trashware</h1>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Trashware</h1>
+
               <p className="text-slate-500 text-sm font-medium">Monitoring System</p>
             </div>
           </div>
 
-          <h2 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-4">Smart Waste Management</h2>
-          <p className="text-slate-600 text-lg leading-relaxed mb-10 max-w-md">Sistem pemantauan tempat sampah berbasis IoT untuk kampus yang lebih bersih dan berkelanjutan</p>
+          {/* Hidden di mobile */}
+          <div className="hidden md:block">
+            <h2 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-4">Smart Waste Management</h2>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="bg-white px-6 py-5 rounded-2xl shadow-sm border border-slate-100 flex-1">
-              <h3 className="text-[#249357] text-3xl font-bold mb-1">24/7</h3>
-              <p className="text-slate-500 text-sm font-medium">Real-time Monitoring</p>
-            </div>
-            <div className="bg-white px-6 py-5 rounded-2xl shadow-sm border border-slate-100 flex-1">
-              <h3 className="text-[#249357] text-3xl font-bold mb-1">IoT</h3>
-              <p className="text-slate-500 text-sm font-medium">Smart Integration</p>
+            <p className="text-slate-600 text-lg leading-relaxed mb-10 max-w-md">Sistem pemantauan tempat sampah berbasis IoT untuk kampus yang lebih bersih dan berkelanjutan</p>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="bg-white px-6 py-5 rounded-2xl shadow-sm border border-slate-100 flex-1">
+                <h3 className="text-[#249357] text-3xl font-bold mb-1">24/7</h3>
+
+                <p className="text-slate-500 text-sm font-medium">Real-time Monitoring</p>
+              </div>
+
+              <div className="bg-white px-6 py-5 rounded-2xl shadow-sm border border-slate-100 flex-1">
+                <h3 className="text-[#249357] text-3xl font-bold mb-1">IoT</h3>
+
+                <p className="text-slate-500 text-sm font-medium">Smart Integration</p>
+              </div>
             </div>
           </div>
         </div>
-
         {/* KANAN (FORM REGISTER) */}
         <div className="mx-auto w-full max-w-md lg:ml-auto">
-          <div className="bg-white p-8 sm:p-10 rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50">
+          <div className="bg-white p-6 sm:p-8 md:p-10 rounded-[1.8rem] shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-white/60 backdrop-blur">
             <div className="mb-8">
               <h2 className="text-xl font-bold text-slate-900 mb-2">Register</h2>
               <p className="text-slate-500 text-sm">Daftar akun baru</p>
             </div>
 
-            <form className="space-y-5" onSubmit={handleRegister}>
+            <form className="space-y-4 md:space-y-5" onSubmit={handleRegister}>
               {/* Nama */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Nama</label>

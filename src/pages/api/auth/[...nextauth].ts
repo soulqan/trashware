@@ -32,10 +32,7 @@ export default NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const q = query(
-          collection(db, "users"),
-          where("email", "==", credentials.email)
-        );
+        const q = query(collection(db, "users"), where("email", "==", credentials.email));
 
         const snapshot = await getDocs(q);
         if (snapshot.empty) return null;
@@ -46,10 +43,7 @@ export default NextAuth({
         // ❗ kalau user Google
         if (!userData.password) return null;
 
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          userData.password
-        );
+        const isValid = await bcrypt.compare(credentials.password, userData.password);
 
         if (!isValid) return null;
 
@@ -76,73 +70,72 @@ export default NextAuth({
     strategy: "jwt",
   },
 
+  secret: process.env.NEXTAUTH_SECRET,
+
   callbacks: {
     // 🔥 simpan user ke token
     async jwt({ token, user, account, trigger, session }) {
-  if (trigger === "update" && session) {
-    const updatedName = session.name ?? session.user?.name;
-    if (updatedName) {
-      token.name = updatedName;
-    }
-  }
+      if (trigger === "update" && session) {
+        const updatedName = session.name ?? session.user?.name;
+        if (updatedName) {
+          token.name = updatedName;
+        }
+      }
 
-  // login credentials
-  if (user) {
-    token.id = user.id;
-    token.name = user.name;
-    token.email = user.email;
-    token.role = user.role;
-  }
+      // login credentials
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.role = user.role;
+      }
 
-  // login Google
-  if (account?.provider === "google") {
-    const q = query(
-      collection(db, "users"),
-      where("email", "==", token.email)
-    );
+      // login Google
+      if (account?.provider === "google") {
+        const q = query(collection(db, "users"), where("email", "==", token.email));
 
-    const snapshot = await getDocs(q);
+        const snapshot = await getDocs(q);
 
-    let dbUser;
+        let dbUser;
 
-    if (snapshot.empty) {
-      const newUser = await addDoc(collection(db, "users"), {
-        email: token.email,
-        fullName: token.name,
-        password: null,
-        role: "petugas",
-        createdAt: new Date(),
-      });
+        if (snapshot.empty) {
+          const newUser = await addDoc(collection(db, "users"), {
+            email: token.email,
+            fullName: token.name,
+            password: null,
+            role: "petugas",
+            createdAt: new Date(),
+          });
 
-      dbUser = {
-        id: newUser.id,
-        name: token.name,
-        email: token.email,
-        role: "petugas",
-      };
-    } else {
-      const docSnap = snapshot.docs[0];
-      const data = docSnap.data();
+          dbUser = {
+            id: newUser.id,
+            name: token.name,
+            email: token.email,
+            role: "petugas",
+          };
+        } else {
+          const docSnap = snapshot.docs[0];
+          const data = docSnap.data();
 
-      dbUser = {
-        id: docSnap.id,
-        name: data.fullName,
-        email: data.email,
-        role: data.role,
-      };
-    }
+          dbUser = {
+            id: docSnap.id,
+            name: data.fullName,
+            email: data.email,
+            role: data.role,
+          };
+        }
 
-    token.id = dbUser.id;
-    token.name = dbUser.name;
-    token.email = dbUser.email;
-    token.role = dbUser.role;
-  }
+        token.id = dbUser.id;
+        token.name = dbUser.name;
+        token.email = dbUser.email;
+        token.role = dbUser.role;
+      }
 
-return token;
-  },
+      return token;
+    },
 
-  // 🔥 ambil ke session (simple dulu)
-  async session({ session, token }) {
+    // 🔥 ambil ke session (simple dulu)
+    async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.name = token.name as string;
