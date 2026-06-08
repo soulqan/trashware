@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth"; // ✅ Tambah import NextAuthOptions
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import type { DefaultSession } from "next-auth";
@@ -20,7 +20,8 @@ declare module "next-auth" {
   }
 }
 
-export default NextAuth({
+// ✅ 1. Ekstrak konfigurasi ke variabel bernama authOptions dan berikan keyword 'export'
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -145,4 +146,7 @@ export default NextAuth({
       return session;
     },
   },
-});
+};
+
+// ✅ 2. Jalankan fungsi NextAuth menggunakan objek konfigurasi di atas
+export default NextAuth(authOptions);

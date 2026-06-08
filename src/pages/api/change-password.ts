@@ -1,11 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, type DocumentReference, type DocumentData } from "firebase/firestore";
 import bcrypt from "bcryptjs";
+import { authOptions } from "./auth/[...nextauth]";// FIX: Diubah menjadi default import (tanpa kurung kurawal)
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getServerSession(req, res);
+  const session = await getServerSession(req, res, authOptions);
 
   if (!session || !session.user?.email) {
     return res.status(401).json({ message: "Unauthorized" });

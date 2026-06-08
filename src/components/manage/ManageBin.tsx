@@ -15,6 +15,7 @@ interface ManageBinProps {
 }
 
 export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps) {
+  // FIX: Menambahkan distance ke dalam nilai awal state
   const [formData, setFormData] = useState<BinData>({
     id: "",
     gedung: "",
@@ -22,7 +23,8 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
     ruang: "",
     capacity: 0,
     level: 0,
-    status: 'on'
+    status: 'on',
+    distance: 0 
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +33,7 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
     if (editData) {
       setFormData(editData);
     } else {
-      // Reset form untuk create baru
+      // FIX: Menambahkan distance saat reset form untuk create baru
       setFormData({
         id: "",
         gedung: "",
@@ -39,7 +41,8 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
         ruang: "",
         capacity: 0,
         level: 0,
-        status: 'on'
+        status: 'on',
+        distance: 0
       });
     }
     setError(null);
@@ -50,7 +53,6 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
     setError(null);
     
     try {
-      // Validasi ID wajib untuk create bin baru
       if (!editData && !formData.id.trim()) {
         setError('ID Bin wajib diisi');
         return;
@@ -150,8 +152,8 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
             </div>
           </div>
 
-          {/* Capacity dan Level */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Capacity, Level, dan Distance */}
+          <div className="space-y-4">
             <div className="space-y-1">
               <label className="text-sm font-semibold text-gray-700 ml-1">Kapasitas (L)</label>
               <input 
@@ -163,16 +165,33 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
                 required
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-sm font-semibold text-emerald-600 ml-1">Level Isi (%)</label>
-              <input 
-                type="number" max="100" min="0"
-                className="w-full px-4 py-3 bg-gray-50 border border-emerald-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                placeholder="0-100"
-                value={formData.level}
-                onChange={(e) => setFormData({...formData, level: Number(e.target.value)})}
-                required
-              />
+            
+            {/* Grid Baru untuk Level dan Distance */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-emerald-600 ml-1">Level Isi (%)</label>
+                <input 
+                  type="number" max="100" min="0"
+                  className="w-full px-4 py-3 bg-gray-50 border border-emerald-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                  placeholder="0-100"
+                  value={formData.level}
+                  onChange={(e) => setFormData({...formData, level: Number(e.target.value)})}
+                  required
+                />
+              </div>
+              
+              {/* KOLOM BARU: Input untuk Distance */}
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-blue-600 ml-1">Jarak Sensor (cm)</label>
+                <input 
+                  type="number" min="0"
+                  className="w-full px-4 py-3 bg-gray-50 border border-blue-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                  placeholder="Contoh: 13"
+                  value={formData.distance}
+                  onChange={(e) => setFormData({...formData, distance: e.target.value ? Number(e.target.value) : 0})}
+                  required
+                />
+              </div>
             </div>
           </div>
 
@@ -182,7 +201,7 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
             <select 
               className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
               value={formData.status}
-              onChange={(e) => setFormData({...formData, status: e.target.value as 'on' | 'off'})}
+              onChange={(e) => e.target.value && setFormData({...formData, status: e.target.value as 'on' | 'off'})}
             >
               <option value="on">ON (Active)</option>
               <option value="off">OFF (Inactive)</option>

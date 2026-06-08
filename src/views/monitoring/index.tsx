@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import PageContainer from '@/components/layout/PageContainer'; 
 import PageHeader from '@/components/layout/PageHeader'; 
@@ -7,9 +9,11 @@ import { useSearch } from '@/context/SearchContext';
 import BinCard from '@/components/dashboard/BinCard';
 import { FiFilter, FiInfo } from 'react-icons/fi';
 import type { Bin } from '@/types/database';
+import { binService } from '@/lib/services/binService'; // ✅ 1. IMPORT SERVICE SINKRONISASI DI SINI
 
 export default function MonitoringView() {
-  const [bins, setBins] = useState<Bin[]>([]);
+  // Intersection Type agar menampung properti firestoreId secara legal
+  const [bins, setBins] = useState<(Bin & { firestoreId: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const { searchQuery } = useSearch(); 
   
@@ -18,17 +22,25 @@ export default function MonitoringView() {
   useEffect(() => {
     const q = query(collection(db, "bins"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const binsData = snapshot.docs.map(doc => ({ 
-        firestoreId: doc.id, 
-        ...doc.data() 
-      }));
+      const binsData = snapshot.docs.map(doc => {
+        const rawBin = { firestoreId: doc.id, ...doc.data() } as Bin & { firestoreId: string };
+        
+        // ✅ 2. KOREKSI STATUS DI SINI (Jika > 8 detik tak kirim data, status otomatis dibalik jadi 'off')
+        const processedBin = binService.enforceHeartbeat(rawBin);
+        
+        return {
+          ...processedBin,
+          firestoreId: doc.id // Pastikan ID dokumen Firestore tetap menempel
+        };
+      });
+      
       setBins(binsData);
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
-  // LOGIKA FILTER GABUNGAN (Search + Dropdown)
+  // LOGIKA FILTER GABUNGAN (Search + Dropdown) - 100% TETAP ASLI TANPA PERUBAHAN
   const filteredBins = bins.filter((bin) => {
     // 1. Filter Search (Menggunakan variabel baru: gedung, lantai, ruang)
     const searchTarget = `${bin.gedung || ''} ${bin.lantai || ''} ${bin.ruang || ''} ${bin.id || ''}`.toLowerCase();
@@ -42,7 +54,7 @@ export default function MonitoringView() {
     else if (statusFilter === "Hampir Penuh") matchesStatus = bin.status === 'on' && currentLevel >= 70 && currentLevel < 90;
     else if (statusFilter === "Terisi") matchesStatus = bin.status === 'on' && currentLevel > 0 && currentLevel < 70;
     else if (statusFilter === "Kosong") matchesStatus = bin.status === 'on' && currentLevel <= 0;
-    else if (statusFilter === "Offline") matchesStatus = bin.status === 'off';
+    else if (statusFilter === "Offline") matchesStatus = bin.status === 'off'; // Otomatis sinkron dengan binService
 
     return matchesSearch && matchesStatus;
   });
@@ -96,14 +108,15 @@ export default function MonitoringView() {
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
           {filteredBins.map((bin) => (
             <BinCard
-              key={bin.firestoreId}
+              key={bin.firestoreId} 
               id={bin.id}
               gedung={bin.gedung}
               lantai={bin.lantai}
               ruang={bin.ruang}
               level={bin.level}
-              status={bin.status}
+              status={bin.status} // Otomatis akurat terkirim ke komponen UI kartu
               capacity={bin.capacity}
+              distance={bin.distance}
             />
           ))}
         </div>

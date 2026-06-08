@@ -42,7 +42,8 @@ export default function ProfilePage() {
     }
   };
 
-  const profileData = profile || session?.user;
+  // FIX: Lakukan casting ke ProfileShape agar TypeScript mengizinkan pembacaan properti .phone
+  const profileData = (profile || session?.user) as ProfileShape | undefined;
 
   return (
     <div className="p-3 sm:p-6">
@@ -57,12 +58,20 @@ export default function ProfilePage() {
               {profileData?.image ? (
                 <img src={profileData.image} alt="avatar" className="w-20 h-20 rounded-full object-cover sm:h-24 sm:w-24" />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-2xl font-bold text-emerald-600 sm:h-24 sm:w-24 sm:text-3xl">{(profileData?.name || "").split(" ").map((n:string)=>n[0]).slice(0,2).join("")}</div>
+                <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-2xl font-bold text-emerald-600 sm:h-24 sm:w-24 sm:text-3xl">
+                  {(profileData?.name || "")
+                    .split(" ")
+                    .filter(Boolean) // Menghindari substring kosong jika ada double space
+                    .map((n: string) => n[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase()} {/* Ditambah toUpperCase agar inisial huruf kapital bagus */}
+                </div>
               )}
               <div>
                 <h2 className="text-xl font-bold text-gray-800 sm:text-2xl">{profileData?.name}</h2>
                 <p className="text-xs text-gray-500 mt-0.5 sm:mt-1 sm:text-sm">{profileData?.email}</p>
-                {profileData?.phone && <p className="text-xs text-gray-500 sm:text-sm">Telepon: {profileData.phone}</p>}
+                {profileData?.phone && <p className="text-xs text-gray-500 sm:text-sm mt-1">Telepon: {profileData.phone}</p>}
               </div>
             </div>
 

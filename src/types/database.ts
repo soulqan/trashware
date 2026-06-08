@@ -5,9 +5,10 @@ export interface Bin {
   gedung: string;
   lantai: string;
   ruang: string;
-  capacity: string | number;
-  level: number;
-  status: 'on' | 'off';
+  capacity: number;          // Diubah ke number sesuai di gambar (100)
+  distance: number;          // BARU: Ditambahkan sesuai di gambar (13)
+  level: number;             // Berwujud angka (46)
+  status: 'on' | 'off';      // Berwujud string ("on")
   lastUpdate?: Timestamp | Date | string | number | null;
 }
 

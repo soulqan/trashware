@@ -2,6 +2,7 @@ import { db } from '@/lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { Bin } from '@/types/database';
 import { notificationReadService } from './notificationReadService';
+import { binService } from './binService'; // ✅ 1. IMPORT BINSERVICE DI SINI
 
 export interface DerivedNotification {
   id: string;
@@ -20,26 +21,27 @@ export interface DerivedNotification {
 }
 
 export const deriveNotificationService = {
-  // Subscribe to bins and derive notifications (ONLY FULL BINS - level >= 90)
+  // Subscribe to bins and derive notifications (ONLY FULL BINS - level >= 90 & status === 'on')
   subscribeToDerivedNotifications(
     callback: (notifications: DerivedNotification[]) => void
   ) {
     const unsubscribe = onSnapshot(collection(db, 'bins'), (snapshot) => {
-      const bins = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Bin[];
+      // ✅ 2. Bungkus dengan binService.enforceHeartbeat saat map data mentah
+      const bins = snapshot.docs.map((doc) => {
+        const rawBin = { id: doc.id, ...doc.data() } as Bin;
+        return binService.enforceHeartbeat(rawBin);
+      });
 
-      // Derive notifications from FULL bins only (level >= 90)
+      // Derive notifications dari tempat sampah yang PENUH DAN AKTIF saja
       const derivedNotifications = bins
-        .filter((bin) => bin.level >= 90) // Only full bins
+        .filter((bin) => bin.status === 'on' && bin.level >= 90) // ✅ Tambah cek status aktif
         .map((bin) => {
-          // Generate location dari gedung, lantai, ruang
           const location = `${bin.gedung} - ${bin.lantai} - ${bin.ruang}`;
           
-          // Convert lastUpdate ke Date jika ada, jika tidak gunakan waktu saat ini
           const timestamp = bin.lastUpdate 
-            ? (bin.lastUpdate.toDate ? bin.lastUpdate.toDate() : new Date(bin.lastUpdate))
+            ? (typeof bin.lastUpdate === 'object' && 'toDate' in bin.lastUpdate
+                ? (bin.lastUpdate as any).toDate()
+                : new Date(bin.lastUpdate as any))
             : new Date();
 
           return {
@@ -53,12 +55,12 @@ export const deriveNotificationService = {
             description: `${location} penuh (level ${bin.level}) - segera kosongkan`,
             level: bin.level,
             capacity: bin.capacity,
-            status: 'baru' as const, // All are new/unread
-            type: 'error' as const, // All are error (full)
+            status: 'baru' as const, 
+            type: 'error' as const, 
             timestamp: timestamp,
           } as DerivedNotification;
         })
-        .sort((a, b) => b.level - a.level); // Sort by level descending
+        .sort((a, b) => b.level - a.level);
 
       callback(derivedNotifications);
     });
@@ -66,7 +68,7 @@ export const deriveNotificationService = {
     return unsubscribe;
   },
 
-  // Get derived notification counts (ONLY FULL BINS - level >= 90) - Real-time with read status
+  // Get derived notification counts (ONLY FULL BINS) - Real-time dengan status baca
   subscribeToNotificationCounts(
     callback: (counts: { semua: number; baru: number; dibaca: number }) => void
   ) {
@@ -75,10 +77,11 @@ export const deriveNotificationService = {
 
     // Subscribe to bins
     const unsubscribeBins = onSnapshot(collection(db, 'bins'), (snapshot) => {
-      binsData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Bin[];
+      // ✅ 3. Bungkus dengan binService.enforceHeartbeat di sini juga
+      binsData = snapshot.docs.map((doc) => {
+        const rawBin = { id: doc.id, ...doc.data() } as Bin;
+        return binService.enforceHeartbeat(rawBin);
+      });
 
       updateCounts();
     });
@@ -93,22 +96,20 @@ export const deriveNotificationService = {
     });
 
     const updateCounts = () => {
-      // Get only FULL bins (level >= 90)
-      const fullBins = binsData.filter((b) => b.level >= 90);
+      // ✅ 4. Filter counter hanya menghitung bin yang aktif 'on' dan penuh >= 90
+      const fullBins = binsData.filter((b) => b.status === 'on' && b.level >= 90);
       const fullBinIds = new Set(fullBins.map((b) => b.id));
 
-      // Clean up read notifications for bins that are no longer full
       notificationReadService.cleanupReadNotificationsForNonFullBins(
         fullBinIds
       );
 
-      // Only count read IDs that are still full bins
       const validReadIds = readIds.filter((id) => fullBinIds.has(id));
 
       callback({
         semua: fullBins.length,
-        baru: fullBins.length - validReadIds.length, // Full bins minus read ones
-        dibaca: validReadIds.length, // Only read notifications that are still full
+        baru: fullBins.length - validReadIds.length, 
+        dibaca: validReadIds.length, 
       });
     };
 
@@ -128,10 +129,11 @@ export const deriveNotificationService = {
 
     // Subscribe to bins
     const unsubscribeBins = onSnapshot(collection(db, 'bins'), (snapshot) => {
-      binsData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Bin[];
+      // ✅ 5. Bungkus dengan binService.enforceHeartbeat di sini juga
+      binsData = snapshot.docs.map((doc) => {
+        const rawBin = { id: doc.id, ...doc.data() } as Bin;
+        return binService.enforceHeartbeat(rawBin);
+      });
 
       updateNotifications();
     });
@@ -143,24 +145,23 @@ export const deriveNotificationService = {
     });
 
     const updateNotifications = () => {
-      // Get only FULL bins (level >= 90)
-      const fullBins = binsData.filter((bin) => bin.level >= 90);
+      // ✅ 6. Filter daftar halaman notifikasi: Hanya ambil bin yang aktif dan penuh
+      const fullBins = binsData.filter((bin) => bin.status === 'on' && bin.level >= 90);
       const fullBinIds = new Set(fullBins.map((b) => b.id));
 
-      // Clean up read notifications for bins that are no longer full
       notificationReadService.cleanupReadNotificationsForNonFullBins(
         fullBinIds
       );
 
-      // Derive notifications from FULL bins only (level >= 90)
       const derivedNotifications = fullBins
         .map((bin) => {
           const location = `${bin.gedung} - ${bin.lantai} - ${bin.ruang}`;
           const isRead = readIds.includes(bin.id);
           
-          // Convert lastUpdate ke Date jika ada, jika tidak gunakan waktu saat ini
           const timestamp = bin.lastUpdate 
-            ? (bin.lastUpdate.toDate ? bin.lastUpdate.toDate() : new Date(bin.lastUpdate))
+            ? (typeof bin.lastUpdate === 'object' && 'toDate' in bin.lastUpdate
+                ? (bin.lastUpdate as any).toDate()
+                : new Date(bin.lastUpdate as any))
             : new Date();
 
           return {

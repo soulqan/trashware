@@ -26,6 +26,7 @@ import {
   FiBarChart2 
 } from 'react-icons/fi';
 import { useRouter } from 'next/router';
+import { binService } from '@/lib/services/binService'; // ✅ 1. IMPORT BINSERVICE DI SINI
 
 export default function ActionView({ id }: { id: string }) {
   const router = useRouter();
@@ -57,7 +58,10 @@ export default function ActionView({ id }: { id: string }) {
     if (!id) return;
     const unsubscribe = onSnapshot(doc(db, "bins", id), (docSnap) => {
       if (docSnap.exists()) {
-        setBinData({ id: docSnap.id, ...docSnap.data() } as Bin);
+        const rawBin = { id: docSnap.id, ...docSnap.data() } as Bin;
+        
+        // ✅ 2. SINKRONISASI STATUS DI SINI (Memastikan status 'on'/'off' jujur dalam hitungan detik)
+        setBinData(binService.enforceHeartbeat(rawBin));
       }
     });
     return () => unsubscribe();
@@ -107,7 +111,7 @@ export default function ActionView({ id }: { id: string }) {
         location: `${binData.gedung} - ${binData.lantai} (${binData.ruang})`,
         levelCaptured: currentLevel,
         status: 'Approved',
-        timestamp: serverTimestamp()
+        timestamp: serverTimestamp() as any
       };
 
       await addDoc(collection(db, "history"), historyData);
@@ -175,8 +179,14 @@ export default function ActionView({ id }: { id: string }) {
               <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest mb-2 flex items-center gap-2 sm:text-[10px]">
                 <FiBarChart2 /> Real-time
               </p>
-              <p className={`font-black text-lg tracking-tighter sm:text-2xl ${binData && binData.level < 20 ? 'text-emerald-500' : 'text-orange-500'}`}>
+              {/* Tambahan visual dinamis jika alat offline secara mendadak */}
+              <p className={`font-black text-lg tracking-tighter sm:text-2xl ${
+                binData?.status === 'off' 
+                  ? 'text-gray-400 line-through' 
+                  : (binData && binData.level < 20 ? 'text-emerald-500' : 'text-orange-500')
+              }`}>
                 {binData ? `${binData.level}%` : '--%'}
+                {binData?.status === 'off' && <span className="text-[10px] block font-medium tracking-normal text-red-500 mt-0.5">⚠️ Perangkat Offline</span>}
               </p>
             </div>
           </div>

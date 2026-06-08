@@ -1,11 +1,14 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import PageContainer from '@/components/layout/PageContainer'; 
-import PageHeader from '@/components/layout/PageHeader'; // Import PageHeader
+import PageHeader from '@/components/layout/PageHeader'; 
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, deleteDoc, doc } from 'firebase/firestore';
 import { useSearch } from '@/context/SearchContext';
 import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import ManageBin, { BinData } from '@/components/manage/ManageBin';
+import { binService } from '@/lib/services/binService'; // ✅ 1. IMPORT SERVICE JANTUNG DI SINI
 
 export default function ManageView() {
   const [bins, setBins] = useState<BinData[]>([]);
@@ -17,10 +20,17 @@ export default function ManageView() {
   useEffect(() => {
     const q = query(collection(db, "bins"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const binsData = snapshot.docs.map(doc => ({ 
-        firestoreId: doc.id, 
-        ...doc.data() 
-      } as BinData));
+      // ✅ 2. BUNGKUS DENGAN ENFORCEHEARTBEAT DI PINTU GERBANG FIRESTORE
+      const binsData = snapshot.docs.map(doc => {
+        const rawBin = { firestoreId: doc.id, ...doc.data() } as any;
+        const processedBin = binService.enforceHeartbeat(rawBin);
+        
+        return {
+          ...processedBin,
+          firestoreId: doc.id // Pastikan ID dokumen Firestore tetap menempel untuk keperluan Delete/Edit
+        } as BinData;
+      });
+      
       setBins(binsData);
       setLoading(false);
     });
@@ -33,6 +43,7 @@ export default function ManageView() {
     }
   };
 
+  // LOGIKA FILTER PENCARIAN - Tetap Asli
   const filteredBins = bins.filter((bin) => {
     const searchTarget = `${bin.ruang} ${bin.lantai} ${bin.gedung} ${bin.id}`.toLowerCase();
     return searchTarget.includes(searchQuery.toLowerCase());
@@ -48,7 +59,7 @@ export default function ManageView() {
 
   return (
     <PageContainer>
-      {/* Header Section menggunakan PageHeader */}
+      {/* Header Section */}
       <div className="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between sm:gap-3">
         <PageHeader 
           title="Manage Bin" 
@@ -62,7 +73,7 @@ export default function ManageView() {
         </button>
       </div>
 
-      {/* Table Section */}
+      {/* Table Section (Desktop) */}
       <div className="hidden overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-sm sm:block">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
@@ -82,7 +93,8 @@ export default function ManageView() {
             <tbody className="divide-y divide-gray-50">
               {filteredBins.map((bin) => {
                 const level = bin.level || 0;
-                const isOnline = bin.status === 'on';
+                // Status ini otomatis akurat (menjadi false jika IoT mati lebih dari 8 detik)
+                const isOnline = bin.status === 'on'; 
 
                 return (
                   <tr key={bin.firestoreId} className="hover:bg-gray-50/40 transition-colors">
@@ -107,7 +119,7 @@ export default function ManageView() {
                       <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${
                         isOnline ? 'border-emerald-200 text-emerald-500 bg-emerald-50' : 'border-red-200 text-red-500 bg-red-50'
                       }`}>
-                        {bin.status || 'OFF'}
+                        {isOnline ? 'ON' : 'OFF'}
                       </span>
                     </td>
 
@@ -130,6 +142,7 @@ export default function ManageView() {
         </div>
       </div>
 
+      {/* Card Section (Mobile) */}
       <div className="space-y-2 sm:hidden">
         {filteredBins.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-gray-200 bg-white p-8 text-center text-gray-400 italic">
@@ -151,7 +164,7 @@ export default function ManageView() {
                   <span className={`rounded-lg px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border sm:px-2.5 sm:py-1 sm:text-[10px] ${
                     isOnline ? 'border-emerald-200 text-emerald-500 bg-emerald-50' : 'border-red-200 text-red-500 bg-red-50'
                   }`}>
-                    {bin.status || 'OFF'}
+                    {isOnline ? 'ON' : 'OFF'}
                   </span>
                 </div>
 
