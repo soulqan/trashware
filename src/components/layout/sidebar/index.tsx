@@ -1,62 +1,82 @@
-import { FiGrid, FiBarChart2, FiMapPin, FiBell, FiSettings, FiChevronLeft, FiTrash2 } from 'react-icons/fi';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { FiGrid, FiMapPin, FiBell, FiTrash2 } from "react-icons/fi";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { FiLogOut, FiX } from "react-icons/fi";
+import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 
 const menuItems = [
-  { name: 'Dashboard', icon: <FiGrid />, path: '/' },
-  { name: 'Monitoring', icon: <FiTrash2 />, path: '/monitoring' },
-  { name: 'Map View', icon: <FiMapPin />, path: '/map-view' },
-  { name: 'Analytics', icon: <FiBarChart2 />, path: '/analytics' },
-  { name: 'Notifications', icon: <FiBell />, path: '/notifications' },
+  { name: "Dashboard", icon: <FiGrid />, path: "/", role: ["admin", "petugas"] },
+  { name: "Monitoring", icon: <FiTrash2 />, path: "/monitoring", role: ["admin", "petugas"] },
+  { name: "Manage Bin", icon: <FiMapPin />, path: "/manage", role: ["admin"] }, // hanya admin
+  // { name: "Analytics", icon: <FiBarChart2 />, path: "/analytics", role: ["admin", "petugas"] },
+  { name: "Notifications", icon: <FiBell />, path: "/notifications", role: ["admin", "petugas"] },
 ];
 
-export default function Sidebar() {
+type Role = "admin" | "petugas";
+
+type SidebarProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const router = useRouter();
 
+  const { data: session } = useSession();
+  const role = (session?.user as { role?: Role })?.role;
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/auth/login" });
+  };
+
   return (
-    <div className="h-screen w-64 bg-white border-r border-gray-100 flex flex-col justify-between p-4 sticky top-0">
-      <div>
-        {/* Logo Section */}
-        <div className="flex items-center gap-3 px-2 mb-10">
-          <div className="bg-emerald-500 p-2 rounded-xl text-white">
-            <FiTrash2 size={24} />
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 flex h-full w-56 flex-col justify-between border-r border-gray-100 bg-white p-2.5 shadow-2xl transition-transform duration-300 sm:w-72 sm:p-4 lg:z-30 lg:h-screen lg:w-64 lg:shadow-none ${
+        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      }`}
+    >
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="mb-4 flex items-center justify-between gap-1.5 px-0.5 sm:mb-8 sm:gap-3 sm:px-2">
+          <div className="flex items-center gap-1">
+            <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={40} height={40} className="object-contain sm:w-12.5 sm:h-12.5" />
+            <div>
+              <h2 className="text-sm font-bold leading-tight text-gray-800 sm:text-lg">TrashWare</h2>
+              <p className="text-[9px] font-medium uppercase tracking-widest text-gray-400 sm:text-[10px]">IoT Monitoring</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-bold text-gray-800 leading-tight">SmartBin</h2>
-            <p className="text-[10px] text-gray-400 font-medium tracking-widest uppercase">IoT Monitoring</p>
-          </div>
+
+          <button onClick={onClose} className="rounded-full p-1.5 text-gray-400 transition hover:bg-gray-50 hover:text-gray-700 lg:hidden sm:p-2">
+            <FiX size={18} />
+          </button>
         </div>
 
-        {/* Menu Items */}
-        <nav className="space-y-1">
-          {menuItems.map((item) => (
-            <Link key={item.path} href={item.path}>
-              <div className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${
-                router.pathname === item.path 
-                ? 'bg-emerald-50 text-emerald-600 font-semibold' 
-                : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'
-              }`}>
-                {item.icon}
-                <span className="text-sm">{item.name}</span>
-              </div>
-            </Link>
-          ))}
+        <nav className="space-y-0.5 overflow-y-auto sm:space-y-1">
+          {menuItems.map((item) => {
+            if (!role || !item.role.includes(role)) return null;
+
+            return (
+              <Link key={item.path} href={item.path} onClick={onClose}>
+                <div
+                  className={`flex items-center gap-2 rounded-lg px-2.5 py-2 cursor-pointer transition-all sm:gap-3 sm:rounded-xl sm:px-4 sm:py-3 ${
+                    router.pathname === item.path ? "bg-emerald-50 text-emerald-600 font-semibold" : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                  }`}
+                >
+                  {item.icon}
+                  <span className="text-[13px] sm:text-sm">{item.name}</span>
+                </div>
+              </Link>
+            );
+          })}
         </nav>
       </div>
 
-      {/* Bottom Section */}
-      <div className="space-y-1 border-t border-gray-50 pt-4">
-        <Link href="/settings">
-          <div className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 rounded-xl cursor-pointer">
-            <FiSettings />
-            <span className="text-sm">Settings</span>
-          </div>
-        </Link>
-        <div className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 rounded-xl cursor-pointer">
-          <FiChevronLeft />
-          <span className="text-sm">Collapse</span>
+      <div className="space-y-1 border-t border-gray-50 pt-2.5 sm:pt-4">
+        <div onClick={handleLogout} className="flex cursor-pointer items-center gap-2.5 rounded-lg bg-red-500 px-2.5 py-2 text-white transition hover:bg-red-600 sm:gap-3 sm:rounded-xl sm:px-4 sm:py-3">
+          <FiLogOut />
+          <span className="text-[13px] sm:text-sm">Logout</span>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }
