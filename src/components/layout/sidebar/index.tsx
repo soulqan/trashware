@@ -1,4 +1,4 @@
-import { FiGrid, FiBarChart2, FiMapPin, FiBell, FiTrash2 } from "react-icons/fi";
+import { FiGrid, FiMapPin, FiBell, FiTrash2 } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FiLogOut, FiX } from "react-icons/fi";
@@ -39,7 +39,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="mb-4 flex items-center justify-between gap-1.5 px-0.5 sm:mb-8 sm:gap-3 sm:px-2">
           <div className="flex items-center gap-1">
-            <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={40} height={40} className="object-contain sm:w-[50px] sm:h-[50px]" />
+            <Image src="/img/logotrashware1.png" alt="Trashware Logo" width={40} height={40} className="object-contain sm:w-12.5 sm:h-12.5" />
             <div>
               <h2 className="text-sm font-bold leading-tight text-gray-800 sm:text-lg">TrashWare</h2>
               <p className="text-[9px] font-medium uppercase tracking-widest text-gray-400 sm:text-[10px]">IoT Monitoring</p>

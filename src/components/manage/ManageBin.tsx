@@ -14,39 +14,37 @@ interface ManageBinProps {
   editData: BinData | null;
 }
 
+const initialFormState: BinData = {
+  id: "",
+  gedung: "",
+  lantai: "",
+  ruang: "",
+  capacity: 0,
+  level: 0,
+  status: 'on',
+  distance: 0 
+};
+
 export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps) {
-  // FIX: Menambahkan distance ke dalam nilai awal state
-  const [formData, setFormData] = useState<BinData>({
-    id: "",
-    gedung: "",
-    lantai: "",
-    ruang: "",
-    capacity: 0,
-    level: 0,
-    status: 'on',
-    distance: 0 
-  });
+  const [formData, setFormData] = useState<BinData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
 
-  // Populate form data ketika editData berubah
+  // FIX: Sinkronisasi state yang aman dengan pengecekan kondisi objek
   useEffect(() => {
     if (editData) {
-      setFormData(editData);
+      // Hanya update state jika data yang masuk berbeda dengan data form saat ini
+      if (formData.firestoreId !== editData.firestoreId || formData.id !== editData.id) {
+        setFormData(editData);
+      }
     } else {
-      // FIX: Menambahkan distance saat reset form untuk create baru
-      setFormData({
-        id: "",
-        gedung: "",
-        lantai: "",
-        ruang: "",
-        capacity: 0,
-        level: 0,
-        status: 'on',
-        distance: 0
-      });
+      // Hanya reset jika form saat ini tidak dalam kondisi kosong/awal
+      if (formData.id !== "") {
+        setFormData(initialFormState);
+      }
     }
     setError(null);
-  }, [editData, isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editData]); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,9 +82,9 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
 
   if (!isOpen) return null;
 
-  return (
+  return (  
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px] p-4 font-sans text-left">
-      <div className="relative w-full max-w-lg rounded-[24px] bg-white p-6 shadow-2xl sm:p-8">
+      <div className="relative w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
         <button onClick={onClose} className="absolute top-6 right-6 p-1 text-gray-400 hover:text-gray-600 transition-colors">
           <FiX size={20} />
         </button>
@@ -166,7 +164,7 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
               />
             </div>
             
-            {/* Grid Baru untuk Level dan Distance */}
+            {/* Grid Level dan Distance */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-emerald-600 ml-1">Level Isi (%)</label>
@@ -180,7 +178,7 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
                 />
               </div>
               
-              {/* KOLOM BARU: Input untuk Distance */}
+              {/* Input untuk Distance */}
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-blue-600 ml-1">Jarak Sensor (cm)</label>
                 <input 

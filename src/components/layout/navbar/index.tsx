@@ -5,6 +5,7 @@ import { deriveNotificationService } from "@/lib/services/deriveNotificationServ
 import { useSearch } from "@/context/SearchContext";
 import { useSession } from "next-auth/react";
 import { FiMenu } from "react-icons/fi";
+import Image from "next/image";
 
 type NavbarProps = {
   onMenuClick?: () => void;
@@ -36,7 +37,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   return (
     <header className="flex items-center gap-1 px-2 py-2 sm:gap-3 sm:px-5 sm:py-4 lg:h-20 lg:px-8 lg:gap-6">
       {/* Menu Button - Mobile Only */}
-      <div className="flex sm:hidden flex-shrink-0">
+      <div className="flex sm:hidden shrink-0">
         <button
           onClick={onMenuClick || (() => {})}
           className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:bg-gray-50"
@@ -82,7 +83,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
       <div className="hidden sm:flex flex-1"></div>
 
       {/* Right Side - Bell and Profile - Always on Right */}
-      <div className="flex items-center justify-end gap-1 sm:gap-4 lg:gap-6 flex-shrink-0">
+      <div className="flex items-center justify-end gap-1 sm:gap-4 lg:gap-6 shrink-0">
         {/* Notification Icon Desktop Only */}
         <button onClick={handleBellClick} className="hidden sm:flex relative hover:text-emerald-500 cursor-pointer transition-colors group items-center justify-center text-gray-500">
           <FiBell size={20} />
@@ -101,7 +102,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               <p className="text-[11px] text-gray-400 capitalize sm:text-xs">{userRole}</p>
             </div>
             {session?.user?.image ? (
-              <img src={session.user.image} alt="avatar" className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm sm:h-10 sm:w-10" />
+              <Image src={session.user.image} alt="avatar" width={40} height={40} className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm sm:h-10 sm:w-10" />
             ) : (
               <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-xs border-2 border-white shadow-sm sm:h-10 sm:w-10 sm:text-sm">
                 {(session?.user?.name || "").split(" ").map((n: string) => n[0]).slice(0,2).join("")}

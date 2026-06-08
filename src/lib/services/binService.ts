@@ -9,10 +9,10 @@ export const binService = {
     let isOnline = bin.status === 'on';
 
     if (bin.lastUpdate) {
-      // Ekstrak waktu milidetik (aman untuk Timestamp Firestore maupun Date)
+      // Ekstrak waktu milidetik menggunakan safe structural casting tanpa 'any'
       const lastUpdateMs = typeof bin.lastUpdate === 'object' && bin.lastUpdate && 'toMillis' in bin.lastUpdate
-        ? (bin.lastUpdate as any).toMillis()
-        : new Date(bin.lastUpdate as any).getTime();
+        ? (bin.lastUpdate as { toMillis: () => number }).toMillis()
+        : new Date(bin.lastUpdate as string | number | Date).getTime();
 
       const batasToleransi = 8 * 1000; // Jeda ketat 8 detik untuk interval IoT 5 detik
       const waktuMaksimalUpdate = Date.now() - batasToleransi;

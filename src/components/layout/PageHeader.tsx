@@ -1,5 +1,3 @@
-import React, { ReactNode } from 'react';
-
 interface PageHeaderProps {
   title: string;
   subtitle?: string;

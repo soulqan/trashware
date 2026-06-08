@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+'use client';
+
+import { useState, useEffect, useCallback } from "react"; 
 import { useSession } from "next-auth/react";
 import ProfileModal from "@/components/profile/ProfileModal";
 import ChangePasswordModal from "@/components/profile/ChangePasswordModal";
+import Image from "next/image"; 
 
 type ProfileShape = {
   name?: string;
@@ -17,13 +20,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileShape | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (session?.user?.email) {
-      fetchProfile();
-    }
-  }, [session]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/profile", { 
@@ -40,9 +37,14 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); 
 
-  // FIX: Lakukan casting ke ProfileShape agar TypeScript mengizinkan pembacaan properti .phone
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetchProfile();
+    }
+  }, [session, fetchProfile]); 
+
   const profileData = (profile || session?.user) as ProfileShape | undefined;
 
   return (
@@ -56,16 +58,24 @@ export default function ProfilePage() {
           <>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
               {profileData?.image ? (
-                <img src={profileData.image} alt="avatar" className="w-20 h-20 rounded-full object-cover sm:h-24 sm:w-24" />
+                <Image 
+                  src={profileData.image} 
+                  alt="avatar" 
+                  width={96} 
+                  height={96} 
+                  className="w-20 h-20 rounded-full object-cover sm:h-24 sm:w-24"
+                  priority 
+                  unoptimized={profileData.image.startsWith('data:')} 
+                />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-2xl font-bold text-emerald-600 sm:h-24 sm:w-24 sm:text-3xl">
                   {(profileData?.name || "")
                     .split(" ")
-                    .filter(Boolean) // Menghindari substring kosong jika ada double space
+                    .filter(Boolean) 
                     .map((n: string) => n[0])
                     .slice(0, 2)
                     .join("")
-                    .toUpperCase()} {/* Ditambah toUpperCase agar inisial huruf kapital bagus */}
+                    .toUpperCase()} 
                 </div>
               )}
               <div>

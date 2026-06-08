@@ -26,7 +26,7 @@ import {
   FiBarChart2 
 } from 'react-icons/fi';
 import { useRouter } from 'next/router';
-import { binService } from '@/lib/services/binService'; // ✅ 1. IMPORT BINSERVICE DI SINI
+import { binService } from '@/lib/services/binService'; 
 
 export default function ActionView({ id }: { id: string }) {
   const router = useRouter();
@@ -111,7 +111,8 @@ export default function ActionView({ id }: { id: string }) {
         location: `${binData.gedung} - ${binData.lantai} (${binData.ruang})`,
         levelCaptured: currentLevel,
         status: 'Approved',
-        timestamp: serverTimestamp() as any
+        // FIX: Mengubah 'as any' menjadi 'as unknown as Date' agar lolos aturan linter ESLint strict
+        timestamp: serverTimestamp() as unknown as Date
       };
 
       await addDoc(collection(db, "history"), historyData);
@@ -155,7 +156,7 @@ export default function ActionView({ id }: { id: string }) {
         <div className="space-y-3 p-3.5 sm:space-y-6 sm:p-8 lg:p-10">
           
           {/* Section: Petugas */}
-          <div className="flex items-center gap-2.5 p-3 bg-emerald-50 rounded-2xl border border-emerald-100 sm:gap-4 sm:p-5 sm:rounded-[24px]">
+          <div className="flex items-center gap-2.5 p-3 bg-emerald-50 rounded-2xl border border-emerald-100 sm:gap-4 sm:p-5 sm:rounded-3xl">
             <div className="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200 sm:h-14 sm:w-14 sm:rounded-2xl">
               <FiUser size={28} />
             </div>
@@ -167,7 +168,7 @@ export default function ActionView({ id }: { id: string }) {
 
           {/* Section: Level Comparison */}
           <div className="grid grid-cols-2 gap-2 sm:gap-6">
-            <div className="p-3 bg-gray-50 rounded-2xl border border-gray-100 sm:p-6 sm:rounded-[24px]">
+            <div className="p-3 bg-gray-50 rounded-2xl border border-gray-100 sm:p-6 sm:rounded-3xl">
               <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2 sm:text-[10px]">
                 <FiBarChart2 /> Level Awal
               </p>
@@ -175,7 +176,7 @@ export default function ActionView({ id }: { id: string }) {
                 {initialLevel !== null ? `${initialLevel}%` : '--%'}
               </p>
             </div>
-            <div className="p-3 bg-emerald-50/30 rounded-2xl border border-emerald-100/50 sm:p-6 sm:rounded-[24px]">
+            <div className="p-3 bg-emerald-50/30 rounded-2xl border border-emerald-100/50 sm:p-6 sm:rounded-3xl">
               <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest mb-2 flex items-center gap-2 sm:text-[10px]">
                 <FiBarChart2 /> Real-time
               </p>
@@ -192,7 +193,7 @@ export default function ActionView({ id }: { id: string }) {
           </div>
 
           {/* Section: Lokasi */}
-          <div className="rounded-2xl border-2 border-dashed border-gray-100 bg-white p-3 sm:p-6 sm:rounded-[24px]">
+          <div className="rounded-2xl border-2 border-dashed border-gray-100 bg-white p-3 sm:p-6 sm:rounded-3xl">
             <div className="flex items-center gap-2 mb-2 text-gray-400">
               <FiMapPin />
               <p className="text-[9px] font-bold uppercase tracking-widest sm:text-[10px]">Titik Unit</p>

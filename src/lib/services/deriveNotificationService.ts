@@ -2,7 +2,7 @@ import { db } from '@/lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { Bin } from '@/types/database';
 import { notificationReadService } from './notificationReadService';
-import { binService } from './binService'; // ✅ 1. IMPORT BINSERVICE DI SINI
+import { binService } from './binService'; 
 
 export interface DerivedNotification {
   id: string;
@@ -26,7 +26,6 @@ export const deriveNotificationService = {
     callback: (notifications: DerivedNotification[]) => void
   ) {
     const unsubscribe = onSnapshot(collection(db, 'bins'), (snapshot) => {
-      // ✅ 2. Bungkus dengan binService.enforceHeartbeat saat map data mentah
       const bins = snapshot.docs.map((doc) => {
         const rawBin = { id: doc.id, ...doc.data() } as Bin;
         return binService.enforceHeartbeat(rawBin);
@@ -34,14 +33,14 @@ export const deriveNotificationService = {
 
       // Derive notifications dari tempat sampah yang PENUH DAN AKTIF saja
       const derivedNotifications = bins
-        .filter((bin) => bin.status === 'on' && bin.level >= 90) // ✅ Tambah cek status aktif
+        .filter((bin) => bin.status === 'on' && bin.level >= 90) 
         .map((bin) => {
           const location = `${bin.gedung} - ${bin.lantai} - ${bin.ruang}`;
           
           const timestamp = bin.lastUpdate 
             ? (typeof bin.lastUpdate === 'object' && 'toDate' in bin.lastUpdate
-                ? (bin.lastUpdate as any).toDate()
-                : new Date(bin.lastUpdate as any))
+                ? (bin.lastUpdate as { toDate: () => Date }).toDate()
+                : new Date(bin.lastUpdate as string | number | Date))
             : new Date();
 
           return {
@@ -76,8 +75,7 @@ export const deriveNotificationService = {
     let readIds: string[] = [];
 
     // Subscribe to bins
-    const unsubscribeBins = onSnapshot(collection(db, 'bins'), (snapshot) => {
-      // ✅ 3. Bungkus dengan binService.enforceHeartbeat di sini juga
+    const unsubscribeBins = onSnapshot(collection(db, 'bins'), (snapshot) => { 
       binsData = snapshot.docs.map((doc) => {
         const rawBin = { id: doc.id, ...doc.data() } as Bin;
         return binService.enforceHeartbeat(rawBin);
@@ -96,7 +94,6 @@ export const deriveNotificationService = {
     });
 
     const updateCounts = () => {
-      // ✅ 4. Filter counter hanya menghitung bin yang aktif 'on' dan penuh >= 90
       const fullBins = binsData.filter((b) => b.status === 'on' && b.level >= 90);
       const fullBinIds = new Set(fullBins.map((b) => b.id));
 
@@ -129,7 +126,6 @@ export const deriveNotificationService = {
 
     // Subscribe to bins
     const unsubscribeBins = onSnapshot(collection(db, 'bins'), (snapshot) => {
-      // ✅ 5. Bungkus dengan binService.enforceHeartbeat di sini juga
       binsData = snapshot.docs.map((doc) => {
         const rawBin = { id: doc.id, ...doc.data() } as Bin;
         return binService.enforceHeartbeat(rawBin);
@@ -140,18 +136,15 @@ export const deriveNotificationService = {
 
     // Subscribe to read notifications (real-time)
     const unsubscribeRead = onSnapshot(collection(db, 'notificationRead'), (snapshot) => {
-      readIds = snapshot.docs.map((doc) => doc.data().notificationId);
+      readIds = snapshot.docs
+        .map((doc) => doc.data() as { notificationId?: string })
+        .map((data) => data.notificationId)
+        .filter((id): id is string => Boolean(id));
       updateNotifications();
     });
 
     const updateNotifications = () => {
-      // ✅ 6. Filter daftar halaman notifikasi: Hanya ambil bin yang aktif dan penuh
       const fullBins = binsData.filter((bin) => bin.status === 'on' && bin.level >= 90);
-      const fullBinIds = new Set(fullBins.map((b) => b.id));
-
-      notificationReadService.cleanupReadNotificationsForNonFullBins(
-        fullBinIds
-      );
 
       const derivedNotifications = fullBins
         .map((bin) => {
@@ -160,8 +153,8 @@ export const deriveNotificationService = {
           
           const timestamp = bin.lastUpdate 
             ? (typeof bin.lastUpdate === 'object' && 'toDate' in bin.lastUpdate
-                ? (bin.lastUpdate as any).toDate()
-                : new Date(bin.lastUpdate as any))
+                ? (bin.lastUpdate as { toDate: () => Date }).toDate()
+                : new Date(bin.lastUpdate as string | number | Date))
             : new Date();
 
           return {

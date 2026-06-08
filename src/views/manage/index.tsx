@@ -22,7 +22,8 @@ export default function ManageView() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       // ✅ 2. BUNGKUS DENGAN ENFORCEHEARTBEAT DI PINTU GERBANG FIRESTORE
       const binsData = snapshot.docs.map(doc => {
-        const rawBin = { firestoreId: doc.id, ...doc.data() } as any;
+        // FIX: Mengganti 'as any' menjadi 'as BinData' untuk menjamin Type Safety
+        const rawBin = { firestoreId: doc.id, ...doc.data() } as BinData;
         const processedBin = binService.enforceHeartbeat(rawBin);
         
         return {
@@ -74,7 +75,7 @@ export default function ManageView() {
       </div>
 
       {/* Table Section (Desktop) */}
-      <div className="hidden overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-sm sm:block">
+      <div className="hidden overflow-hidden rounded-4xl border border-gray-100 bg-white shadow-sm sm:block">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead className="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest font-black text-left">
