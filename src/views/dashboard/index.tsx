@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import PageContainer from '@/components/layout/PageContainer'; 
 import PageHeader from '@/components/layout/PageHeader'; 
@@ -8,16 +10,24 @@ import { FiTrash2, FiCheckCircle, FiAlertTriangle, FiXCircle, FiWifiOff } from '
 import { formatDurationInHours, getPickupPriorityRanking } from '@/lib/services/historyAnalyticsService';
 import { subscribeHistoryRecords } from '@/lib/services/historyService';
 import type { HistoryRecord } from '@/lib/services/historyService';
+import type { Bin } from '@/types/database'; // ✅ Gunakan tipe data Bin murni dari database
+import { binService } from '@/lib/services/binService'; // ✅ 1. IMPORT SERVICE SINKRONISASI DI SINI
 
 export default function DashboardView() {
-  const [bins, setBins] = useState<Array<{ id: string; gedung?: string; lantai?: string | number; ruang?: string; level?: number; status?: string; capacity?: number; location?: string }>>([])
+  // FIX: Ubah tipe data state menjadi Bin[] agar aman dari Type Error TypeScript
+  const [bins, setBins] = useState<Bin[]>([]);
   const [loading, setLoading] = useState(true);
   const [historyRecords, setHistoryRecords] = useState<HistoryRecord[]>([]);
 
   useEffect(() => {
     const q = query(collection(db, "bins"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const binsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // ✅ 2. KOREKSI STATUS DI PINTU GERBANG FIRESTORE (Jika > 8 detik mati, paksa status 'off')
+      const binsData = snapshot.docs.map(doc => {
+        const rawBin = { id: doc.id, ...doc.data() } as Bin;
+        return binService.enforceHeartbeat(rawBin);
+      });
+      
       setBins(binsData);
       setLoading(false);
     });
@@ -29,13 +39,13 @@ export default function DashboardView() {
     return () => unsub();
   }, []);
 
+  // LOGIKA HITUNG STATISTIK - Otomatis Akurat karena status bins sudah diproses binService
   const stats = {
     total: bins.length,
-    // Update pengecekan menggunakan b.level
     empty: bins.filter(b => b.status === 'on' && (b.level ?? 0) < 20).length,
     nearlyFull: bins.filter(b => b.status === 'on' && (b.level ?? 0) >= 70 && (b.level ?? 0) < 90).length,
     full: bins.filter(b => b.status === 'on' && (b.level ?? 0) >= 90).length,
-    offline: bins.filter(b => b.status === 'off').length,
+    offline: bins.filter(b => b.status === 'off').length, // Otomatis bertambah jika alat mati suri
   };
 
   if (loading) return (
@@ -73,38 +83,7 @@ export default function DashboardView() {
         </div>
       )}
 
-      {/* 3. Monitoring Real-time */}
-      {/* <div className="space-y-4">
-        <div className="flex flex-col">
-          <h2 className="text-xl font-black text-gray-800">Monitoring Real-time</h2>
-          <p className="text-xs text-gray-400">
-            {searchQuery ? `Hasil pencarian untuk "${searchQuery}"` : "Tempat sampah yang memerlukan perhatian"}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredBins.length > 0 ? (
-            filteredBins.map((bin) => (
-              <BinCard
-                key={bin.id}
-                id={bin.id}
-                gedung={bin.gedung || ''}
-                lantai={String(bin.lantai || '')}
-                ruang={bin.ruang || ''}
-                level={bin.level || 0}
-                status={bin.status === 'on' ? 'on' : 'off'}
-                capacity={bin.capacity || 0}
-              />
-            ))
-          ) : (
-            <div className="col-span-full py-20 text-center text-gray-400 italic text-sm border border-dashed border-gray-200 rounded-3xl">
-              Data tidak ditemukan...
-            </div>
-          )}
-        </div>
-      </div> */}
-
-      {/* 4. Prioritas Pengambilan - Leaderboard */}
+      {/* 3. Prioritas Pengambilan - Leaderboard */}
       <div className="mt-4 sm:mt-8">
         <div className="mb-2 flex flex-col gap-0.5 sm:mb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-1">
           <h2 className="text-base font-black text-gray-800 sm:text-lg">Prioritas Pengambilan</h2>
@@ -113,6 +92,7 @@ export default function DashboardView() {
 
         <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-1">
           {(() => {
+            // Algoritma ranking otomatis menggunakan data bins yang statusnya sudah valid
             const ranking = getPickupPriorityRanking(bins, historyRecords).slice(0, 10);
 
             if (!ranking || ranking.length === 0) return (
@@ -149,13 +129,6 @@ export default function DashboardView() {
                       ></div>
                     </div>
                   </div>
-
-                  {/* Reason
-                  {r.reason && (
-                    <div className="text-xs text-gray-600 mt-2 italic">
-                      {r.reason}
-                    </div>
-                  )} */}
 
                   {/* Full Age */}
                   {r.fullAgeMinutes != null && (

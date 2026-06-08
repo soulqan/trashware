@@ -2,9 +2,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, type DocumentReference, type DocumentData } from "firebase/firestore";
+import { authOptions } from "./auth/[...nextauth]"; // 1. TAMBAHKAN IMPORT AUTHOPTIONS DI SINI
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getServerSession(req, res);
+  // 2. MASUKKAN authOptions sebagai argumen ketiga
+  const session = await getServerSession(req, res, authOptions);
 
   if (!session || !session.user?.email) {
     return res.status(401).json({ message: "Unauthorized" });
