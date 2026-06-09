@@ -25,7 +25,8 @@ const parseFirestoreDate = (value: Timestamp | Date | string | number | null | u
 
 
 export const subscribeHistoryRecords = (onData: (data: HistoryRecord[]) => void, onError?: (error: unknown) => void) => {
-  const historyQuery = query(collection(db, 'bin_history'), orderBy('timestamp', 'asc'));
+  // Use the 'history' collection where ActionView stores TrashHistory records
+  const historyQuery = query(collection(db, 'history'), orderBy('timestamp', 'asc'));
 
   return onSnapshot(
     historyQuery,
@@ -43,7 +44,8 @@ export const subscribeHistoryRecords = (onData: (data: HistoryRecord[]) => void,
           id: historyDoc.id,
           binId: data.binId || 'Unknown ID',
           location: composedLocation,
-          capacity: data.capacity || 0,
+          // Accept either 'capacity' or 'levelCaptured' (ActionView uses levelCaptured)
+          capacity: typeof data.capacity === 'number' ? data.capacity : (typeof data.levelCaptured === 'number' ? data.levelCaptured : 0),
           timestamp: parseFirestoreDate(data.timestamp),
         };
       });
