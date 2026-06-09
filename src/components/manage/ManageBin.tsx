@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { db } from '@/lib/firebase';
 import { updateDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { FiX } from 'react-icons/fi';
@@ -8,6 +8,7 @@ export interface BinData extends Bin {
   firestoreId?: string;
 }
 
+// FIX 1: Menambahkan kembali interface ManageBinProps yang terlewat
 interface ManageBinProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,30 +22,16 @@ const initialFormState: BinData = {
   ruang: "",
   capacity: 0,
   level: 0,
-  status: 'on',
+  status: 'off',
   distance: 0 
 };
 
 export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps) {
-  const [formData, setFormData] = useState<BinData>(initialFormState);
+  // FIX 2 & 3: Menghapus useEffect sepenuhnya. 
+  // State langsung diinisialisasi dari editData (jika ada) atau initialFormState.
+  // Ini sangat aman karena komponen di-remount oleh parent menggunakan properti 'key'.
+  const [formData, setFormData] = useState<BinData>(editData || initialFormState);
   const [error, setError] = useState<string | null>(null);
-
-  // FIX: Sinkronisasi state yang aman dengan pengecekan kondisi objek
-  useEffect(() => {
-    if (editData) {
-      // Hanya update state jika data yang masuk berbeda dengan data form saat ini
-      if (formData.firestoreId !== editData.firestoreId || formData.id !== editData.id) {
-        setFormData(editData);
-      }
-    } else {
-      // Hanya reset jika form saat ini tidak dalam kondisi kosong/awal
-      if (formData.id !== "") {
-        setFormData(initialFormState);
-      }
-    }
-    setError(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editData]); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,19 +44,28 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
       }
 
       if (editData?.firestoreId) {
-        // UPDATE existing bin
+        // UPDATE: Hanya kirim data konfigurasi web saja.
         const docRef = doc(db, "bins", editData.firestoreId);
-        const dataToSave = { ...formData };
-        delete dataToSave.firestoreId;
         await updateDoc(docRef, {
-          ...dataToSave,
+          gedung: formData.gedung,
+          lantai: formData.lantai,
+          ruang: formData.ruang,
+          capacity: formData.capacity,
           lastUpdate: serverTimestamp()
         });
       } else {
-        // CREATE new bin dengan ID sebagai document ID
-        const docRef = doc(db, "bins", formData.id);
+        // CREATE: Buat dokumen baru dengan ID bertindak sebagai Document ID.
+        // Field sensor/IoT sengaja di-set null.
+        const docRef = doc(db, "bins", formData.id.trim());
         await setDoc(docRef, {
-          ...formData,
+          id: formData.id.trim(),
+          gedung: formData.gedung,
+          lantai: formData.lantai,
+          ruang: formData.ruang,
+          capacity: formData.capacity,
+          level: null,      
+          distance: null,   
+          status: null,     
           lastUpdate: serverTimestamp()
         });
       }
@@ -95,7 +91,6 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* ID - Read only untuk edit, required untuk create */}
           <div className="space-y-1">
             <label className="text-sm font-semibold text-gray-700 ml-1">
               ID Bin {!editData && <span className="text-red-500">*</span>}
@@ -114,7 +109,6 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
             />
           </div>
 
-          {/* Gedung */}
           <div className="space-y-1">
             <label className="text-sm font-semibold text-gray-700 ml-1">Gedung/Lokasi</label>
             <input 
@@ -126,7 +120,6 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
             />
           </div>
 
-          {/* Lantai dan Ruang */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1">
               <label className="text-sm font-semibold text-gray-700 ml-1">Lantai</label>
@@ -150,60 +143,16 @@ export default function ManageBin({ isOpen, onClose, editData }: ManageBinProps)
             </div>
           </div>
 
-          {/* Capacity, Level, dan Distance */}
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-sm font-semibold text-gray-700 ml-1">Kapasitas (L)</label>
-              <input 
-                type="number" min="0"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                placeholder="Contoh: 100"
-                value={formData.capacity}
-                onChange={(e) => setFormData({...formData, capacity: e.target.value ? Number(e.target.value) : 0})}
-                required
-              />
-            </div>
-            
-            {/* Grid Level dan Distance */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-emerald-600 ml-1">Level Isi (%)</label>
-                <input 
-                  type="number" max="100" min="0"
-                  className="w-full px-4 py-3 bg-gray-50 border border-emerald-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                  placeholder="0-100"
-                  value={formData.level}
-                  onChange={(e) => setFormData({...formData, level: Number(e.target.value)})}
-                  required
-                />
-              </div>
-              
-              {/* Input untuk Distance */}
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-blue-600 ml-1">Jarak Sensor (cm)</label>
-                <input 
-                  type="number" min="0"
-                  className="w-full px-4 py-3 bg-gray-50 border border-blue-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                  placeholder="Contoh: 13"
-                  value={formData.distance}
-                  onChange={(e) => setFormData({...formData, distance: e.target.value ? Number(e.target.value) : 0})}
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Status */}
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-gray-700 ml-1">Status Perangkat</label>
-            <select 
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
-              value={formData.status}
-              onChange={(e) => e.target.value && setFormData({...formData, status: e.target.value as 'on' | 'off'})}
-            >
-              <option value="on">ON (Active)</option>
-              <option value="off">OFF (Inactive)</option>
-            </select>
+            <label className="text-sm font-semibold text-gray-700 ml-1">Kapasitas (L)</label>
+            <input 
+              type="number" min="0"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+              placeholder="Contoh: 100"
+              value={formData.capacity || ""}
+              onChange={(e) => setFormData({...formData, capacity: e.target.value ? Number(e.target.value) : 0})}
+              required
+            />
           </div>
 
           {error && (
