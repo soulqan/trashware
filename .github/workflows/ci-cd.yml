@@ -2,7 +2,7 @@ name: Trashware PR Gatekeeper
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, UTS ]
     types: [ opened, synchronize, reopened ]
     
 concurrency:

@@ -9,7 +9,6 @@ import { useSearch } from '@/context/SearchContext';
 import BinCard from '@/components/dashboard/BinCard';
 import { FiFilter, FiInfo } from 'react-icons/fi';
 import type { Bin } from '@/types/database';
-import { binService } from '@/lib/services/binService'; // ✅ 1. IMPORT SERVICE SINKRONISASI DI SINI
 
 export default function MonitoringView() {
   // Intersection Type agar menampung properti firestoreId secara legal
@@ -22,16 +21,9 @@ export default function MonitoringView() {
   useEffect(() => {
     const q = query(collection(db, "bins"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      // 🟢 SEKARANG: Langsung mengambil data asli Firestore tanpa perantara binService
       const binsData = snapshot.docs.map(doc => {
-        const rawBin = { firestoreId: doc.id, ...doc.data() } as Bin & { firestoreId: string };
-        
-        // ✅ 2. KOREKSI STATUS DI SINI (Jika > 8 detik tak kirim data, status otomatis dibalik jadi 'off')
-        const processedBin = binService.enforceHeartbeat(rawBin);
-        
-        return {
-          ...processedBin,
-          firestoreId: doc.id // Pastikan ID dokumen Firestore tetap menempel
-        };
+        return { firestoreId: doc.id, ...doc.data() } as Bin & { firestoreId: string };
       });
       
       setBins(binsData);
@@ -42,11 +34,11 @@ export default function MonitoringView() {
 
   // LOGIKA FILTER GABUNGAN (Search + Dropdown) - 100% TETAP ASLI TANPA PERUBAHAN
   const filteredBins = bins.filter((bin) => {
-    // 1. Filter Search (Menggunakan variabel baru: gedung, lantai, ruang)
+    // 1. Filter Search (Menggunakan variabel: gedung, lantai, ruang)
     const searchTarget = `${bin.gedung || ''} ${bin.lantai || ''} ${bin.ruang || ''} ${bin.id || ''}`.toLowerCase();
     const matchesSearch = searchTarget.includes(searchQuery.toLowerCase());
 
-    // 2. Filter Dropdown Status (Menggunakan variabel 'level')
+    // 2. Filter Dropdown Status (Menggunakan variabel 'level' dan 'status' mentah)
     let matchesStatus = true;
     const currentLevel = bin.level ?? 0;
     
@@ -54,7 +46,7 @@ export default function MonitoringView() {
     else if (statusFilter === "Hampir Penuh") matchesStatus = bin.status === 'on' && currentLevel >= 70 && currentLevel < 90;
     else if (statusFilter === "Terisi") matchesStatus = bin.status === 'on' && currentLevel > 0 && currentLevel < 70;
     else if (statusFilter === "Kosong") matchesStatus = bin.status === 'on' && currentLevel <= 0;
-    else if (statusFilter === "Offline") matchesStatus = bin.status === 'off'; // Otomatis sinkron dengan binService
+    else if (statusFilter === "Offline") matchesStatus = bin.status === 'off'; 
 
     return matchesSearch && matchesStatus;
   });
@@ -114,7 +106,7 @@ export default function MonitoringView() {
               lantai={bin.lantai}
               ruang={bin.ruang}
               level={bin.level}
-              status={bin.status} // Otomatis akurat terkirim ke komponen UI kartu
+              status={bin.status} 
               capacity={bin.capacity}
               distance={bin.distance}
             />
