@@ -8,7 +8,6 @@ import { collection, onSnapshot, query, deleteDoc, doc } from 'firebase/firestor
 import { useSearch } from '@/context/SearchContext';
 import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import ManageBin, { BinData } from '@/components/manage/ManageBin';
-import { binService } from '@/lib/services/binService'; // ✅ 1. IMPORT SERVICE JANTUNG DI SINI
 
 export default function ManageView() {
   const [bins, setBins] = useState<BinData[]>([]);
@@ -20,16 +19,9 @@ export default function ManageView() {
   useEffect(() => {
     const q = query(collection(db, "bins"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // ✅ 2. BUNGKUS DENGAN ENFORCEHEARTBEAT DI PINTU GERBANG FIRESTORE
+      // 🟢 SEKARANG: Langsung mengambil data asli dari Firestore secara bersih dan aman
       const binsData = snapshot.docs.map(doc => {
-        // FIX: Mengganti 'as any' menjadi 'as BinData' untuk menjamin Type Safety
-        const rawBin = { firestoreId: doc.id, ...doc.data() } as BinData;
-        const processedBin = binService.enforceHeartbeat(rawBin);
-        
-        return {
-          ...processedBin,
-          firestoreId: doc.id // Pastikan ID dokumen Firestore tetap menempel untuk keperluan Delete/Edit
-        } as BinData;
+        return { firestoreId: doc.id, ...doc.data() } as BinData;
       });
       
       setBins(binsData);
@@ -85,7 +77,7 @@ export default function ManageView() {
                 <th className="px-6 py-5">Lantai</th>
                 <th className="px-6 py-5">Ruang</th>
                 <th className="px-6 py-5">Kapasitas</th>
-                <th className="px-6 py-5">Level Isi</th>
+                <th className="px-6 py-5 text-center">Level Isi</th>
                 <th className="px-6 py-5 text-center">Status Isi</th>
                 <th className="px-6 py-5 text-center">Device</th>
                 <th className="px-6 py-5 text-center">Aksi</th>
@@ -94,7 +86,7 @@ export default function ManageView() {
             <tbody className="divide-y divide-gray-50">
               {filteredBins.map((bin) => {
                 const level = bin.level || 0;
-                // Status ini otomatis akurat (menjadi false jika IoT mati lebih dari 8 detik)
+                // Murni membaca string 'on' dari database hasil kiriman rutin hardware
                 const isOnline = bin.status === 'on'; 
 
                 return (
@@ -104,7 +96,7 @@ export default function ManageView() {
                     <td className="px-6 py-4 text-sm text-gray-600 font-medium">{bin.lantai}</td>
                     <td className="px-6 py-4 text-sm text-gray-600 font-medium">{bin.ruang}</td>
                     <td className="px-6 py-4 text-sm text-gray-500 font-bold italic">{bin.capacity}L</td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-700">{level}%</td>
+                    <td className="px-6 py-4 text-sm font-bold text-center text-gray-700">{level}%</td>
                     
                     <td className="px-6 py-4 text-center">
                       <span className={`px-4 py-1.5 rounded-xl text-[11px] font-bold text-white inline-block w-28 text-center shadow-sm ${
