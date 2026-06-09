@@ -2,7 +2,6 @@ import { db } from '@/lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { Bin } from '@/types/database';
 import { notificationReadService } from './notificationReadService';
-import { binService } from './binService'; 
 
 export interface DerivedNotification {
   id: string;
@@ -26,9 +25,9 @@ export const deriveNotificationService = {
     callback: (notifications: DerivedNotification[]) => void
   ) {
     const unsubscribe = onSnapshot(collection(db, 'bins'), (snapshot) => {
+      // 🟢 SEKARANG: Langsung mengambil data asli dari Firestore
       const bins = snapshot.docs.map((doc) => {
-        const rawBin = { id: doc.id, ...doc.data() } as Bin;
-        return binService.enforceHeartbeat(rawBin);
+        return { id: doc.id, ...doc.data() } as Bin;
       });
 
       // Derive notifications dari tempat sampah yang PENUH DAN AKTIF saja
@@ -76,9 +75,9 @@ export const deriveNotificationService = {
 
     // Subscribe to bins
     const unsubscribeBins = onSnapshot(collection(db, 'bins'), (snapshot) => { 
+      // 🟢 SEKARANG: Langsung bypass data tanpa filter enforceHeartbeat
       binsData = snapshot.docs.map((doc) => {
-        const rawBin = { id: doc.id, ...doc.data() } as Bin;
-        return binService.enforceHeartbeat(rawBin);
+        return { id: doc.id, ...doc.data() } as Bin;
       });
 
       updateCounts();
@@ -126,9 +125,9 @@ export const deriveNotificationService = {
 
     // Subscribe to bins
     const unsubscribeBins = onSnapshot(collection(db, 'bins'), (snapshot) => {
+      // 🟢 SEKARANG: Bersih dari import binService
       binsData = snapshot.docs.map((doc) => {
-        const rawBin = { id: doc.id, ...doc.data() } as Bin;
-        return binService.enforceHeartbeat(rawBin);
+        return { id: doc.id, ...doc.data() } as Bin;
       });
 
       updateNotifications();

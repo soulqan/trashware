@@ -26,7 +26,6 @@ import {
   FiBarChart2 
 } from 'react-icons/fi';
 import { useRouter } from 'next/router';
-import { binService } from '@/lib/services/binService'; 
 
 export default function ActionView({ id }: { id: string }) {
   const router = useRouter();
@@ -58,10 +57,9 @@ export default function ActionView({ id }: { id: string }) {
     if (!id) return;
     const unsubscribe = onSnapshot(doc(db, "bins", id), (docSnap) => {
       if (docSnap.exists()) {
+        // 🟢 SEKARANG: Langsung mengambil data asli Firestore tanpa perantara enforceHeartbeat
         const rawBin = { id: docSnap.id, ...docSnap.data() } as Bin;
-        
-        // ✅ 2. SINKRONISASI STATUS DI SINI (Memastikan status 'on'/'off' jujur dalam hitungan detik)
-        setBinData(binService.enforceHeartbeat(rawBin));
+        setBinData(rawBin);
       }
     });
     return () => unsubscribe();
@@ -111,7 +109,6 @@ export default function ActionView({ id }: { id: string }) {
         location: `${binData.gedung} - ${binData.lantai} (${binData.ruang})`,
         levelCaptured: currentLevel,
         status: 'Approved',
-        // FIX: Mengubah 'as any' menjadi 'as unknown as Date' agar lolos aturan linter ESLint strict
         timestamp: serverTimestamp() as unknown as Date
       };
 
@@ -135,7 +132,7 @@ export default function ActionView({ id }: { id: string }) {
     }
   };
 
-  // UI state untuk proteksi tombol (Double Bang !! untuk menghindari null error di TypeScript)
+  // UI state untuk proteksi tombol
   const isButtonDisabled = !!isProcessing || !binData || (!!binData && binData.level < 20 && !message);
 
   return (
@@ -180,7 +177,7 @@ export default function ActionView({ id }: { id: string }) {
               <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest mb-2 flex items-center gap-2 sm:text-[10px]">
                 <FiBarChart2 /> Real-time
               </p>
-              {/* Tambahan visual dinamis jika alat offline secara mendadak */}
+              {/* Membaca string status asli kiriman hardware */}
               <p className={`font-black text-lg tracking-tighter sm:text-2xl ${
                 binData?.status === 'off' 
                   ? 'text-gray-400 line-through' 

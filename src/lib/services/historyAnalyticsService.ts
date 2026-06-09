@@ -27,23 +27,15 @@ export type BinPriorityItem = {
 
 // Compute pickup priority ranking using live bins and optional history records
 export const getPickupPriorityRanking = (
-  liveBins: Array<{ id: string; location?: string; capacity?: number; level?: number; status?: string; gedung?: string; lantai?: string|number; ruang?: string }> = [],
+  liveBins: Array<{ id: string; location?: string; capacity?: number; level?: number; status?: string; lastUpdate?: Date | string | number | { toDate?: () => Date; toMillis?: () => number } | null; gedung?: string; lantai?: string|number; ruang?: string }> = [],
   historyRecords: HistoryRecord[] = []
 ): BinPriorityItem[] => {
   const now = Date.now();
 
-  // helper: find last timestamp when this bin was >
-  const lastFullTimeForBin = (binId: string) => {
-    const rec = [...historyRecords]
-      .filter((r) => r.binId === binId && typeof r.capacity === 'number' && r.capacity )
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0];
-    return rec ? rec.timestamp.getTime() : null;
-  };
-
   // helper: count how often bin was full in recent period (e.g., 7 days)
   const fullCountForBin = (binId: string, days = 7) => {
     const cutoff = now - days * 24 * 60 * 60 * 1000;
-    return historyRecords.filter((r) => r.binId === binId && r.timestamp.getTime() >= cutoff && r.capacity).length;
+    return historyRecords.filter((r) => r.binId === binId && r.timestamp.getTime() >= cutoff && r.capacity >= 90).length;
   };
 
   const items = liveBins.map((bin) => {
@@ -62,14 +54,24 @@ export const getPickupPriorityRanking = (
       'Lokasi Tidak Diketahui';
     const binId = bin.id;
 
-    const lastFullTs = lastFullTimeForBin(binId);
+    const lastUpdateTs = bin.lastUpdate
+      ? (typeof bin.lastUpdate === 'object' && bin.lastUpdate !== null && 'toDate' in bin.lastUpdate && typeof bin.lastUpdate.toDate === 'function'
+          ? bin.lastUpdate.toDate().getTime()
+          : typeof bin.lastUpdate === 'object' && bin.lastUpdate !== null && 'toMillis' in bin.lastUpdate && typeof bin.lastUpdate.toMillis === 'function'
+            ? bin.lastUpdate.toMillis()
+            : new Date(bin.lastUpdate as string | number | Date).getTime())
+      : null;
+
+    const lastFullTs = currentLevel >= 90
+      ? lastUpdateTs ?? now
+      : null;
     let fullAgeMinutes: number | null = null;
     if (lastFullTs) {
       fullAgeMinutes = Math.max(0, Math.floor((now - lastFullTs) / 60000));
     }
 
-    // Only rank bins that are currently full. This keeps the leaderboard aligned with manage/monitoring.
-    if (status !== 'on' || currentLevel ) {
+    // Rank only bins that are full and currently online.
+    if (status !== 'on' || currentLevel < 90) {
       return null;
     }
 
