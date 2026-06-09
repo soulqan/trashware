@@ -10,11 +10,9 @@ import { FiTrash2, FiCheckCircle, FiAlertTriangle, FiXCircle, FiWifiOff } from '
 import { formatDurationInHours, getPickupPriorityRanking } from '@/lib/services/historyAnalyticsService';
 import { subscribeHistoryRecords } from '@/lib/services/historyService';
 import type { HistoryRecord } from '@/lib/services/historyService';
-import type { Bin } from '@/types/database'; // ✅ Gunakan tipe data Bin murni dari database
-import { binService } from '@/lib/services/binService'; // ✅ 1. IMPORT SERVICE SINKRONISASI DI SINI
+import type { Bin } from '@/types/database'; // ✅ Menggunakan tipe data Bin murni dari database
 
 export default function DashboardView() {
-  // FIX: Ubah tipe data state menjadi Bin[] agar aman dari Type Error TypeScript
   const [bins, setBins] = useState<Bin[]>([]);
   const [loading, setLoading] = useState(true);
   const [historyRecords, setHistoryRecords] = useState<HistoryRecord[]>([]);
@@ -22,10 +20,9 @@ export default function DashboardView() {
   useEffect(() => {
     const q = query(collection(db, "bins"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      // ✅ 2. KOREKSI STATUS DI PINTU GERBANG FIRESTORE (Jika > 8 detik mati, paksa status 'off')
+      // 🟢 SEKARANG: Langsung ambil data mentah dari Firestore tanpa filter waktu binService
       const binsData = snapshot.docs.map(doc => {
-        const rawBin = { id: doc.id, ...doc.data() } as Bin;
-        return binService.enforceHeartbeat(rawBin);
+        return { id: doc.id, ...doc.data() } as Bin;
       });
       
       setBins(binsData);
@@ -39,13 +36,13 @@ export default function DashboardView() {
     return () => unsub();
   }, []);
 
-  // LOGIKA HITUNG STATISTIK - Otomatis Akurat karena status bins sudah diproses binService
+  // LOGIKA HITUNG STATISTIK - Sekarang membaca string "on"/"off" asli kiriman hardware
   const stats = {
     total: bins.length,
     empty: bins.filter(b => b.status === 'on' && (b.level ?? 0) < 20).length,
     nearlyFull: bins.filter(b => b.status === 'on' && (b.level ?? 0) >= 70 && (b.level ?? 0) < 90).length,
     full: bins.filter(b => b.status === 'on' && (b.level ?? 0) >= 90).length,
-    offline: bins.filter(b => b.status === 'off').length, // Otomatis bertambah jika alat mati suri
+    offline: bins.filter(b => b.status === 'off').length, 
   };
 
   if (loading) return (
@@ -92,7 +89,6 @@ export default function DashboardView() {
 
         <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-1">
           {(() => {
-            // Algoritma ranking otomatis menggunakan data bins yang statusnya sudah valid
             const ranking = getPickupPriorityRanking(bins, historyRecords).slice(0, 10);
 
             if (!ranking || ranking.length === 0) return (
