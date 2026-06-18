@@ -108,15 +108,16 @@ src/
 
 ## Routes
 
-### Public / auth routes
+### Public / Auth Routes
 
-- `/auth/login`
-- `/auth/register`
+- `/` - Public Interactive Landing Page (features, tech stack, live ESP32 simulator, and system telemetry console)
+- `/auth/login` - User Sign-in Page (Credentials login + Google Google login)
+- `/auth/register` - User Registration Page
 
-### Main app routes
+### Protected App Routes (Dashboard)
 
-- `/` - dashboard
-- `/monitoring` - live bin monitoring
+- `/dashboard` - Summary cards, attention list, and pickup priority leaderboard
+- `/monitoring` - Live monitoring sheet of all bins with status/building filters
 - `/monitoring/[id]` - bin detail / action page
 - `/manage` - bin management
 - `/notifications` - derived alerts

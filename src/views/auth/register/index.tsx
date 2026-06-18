@@ -131,7 +131,7 @@ export default function RegisterPage() {
               </div>
 
               {/* Google Login */}
-              <button type="button" onClick={() => signIn("google", { callbackUrl: "/" })} className="w-full flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 py-3 rounded-xl transition">
+              <button type="button" onClick={() => signIn("google", { callbackUrl: "/dashboard" })} className="w-full flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 py-3 rounded-xl transition">
                 <FcGoogle className="text-xl" />
                 <span className="text-sm font-medium text-slate-700">Daftar dengan Google</span>
               </button>

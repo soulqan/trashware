@@ -6,7 +6,7 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 
 const menuItems = [
-  { name: "Dashboard", icon: <FiGrid />, path: "/", role: ["admin", "petugas"] },
+  { name: "Dashboard", icon: <FiGrid />, path: "/dashboard", role: ["admin", "petugas"] },
   { name: "Monitoring", icon: <FiTrash2 />, path: "/monitoring", role: ["admin", "petugas"] },
   { name: "Manage Bin", icon: <FiMapPin />, path: "/manage", role: ["admin"] }, // hanya admin
   // { name: "Analytics", icon: <FiBarChart2 />, path: "/analytics", role: ["admin", "petugas"] },
