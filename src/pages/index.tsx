@@ -31,47 +31,12 @@ export default function LandingPage() {
   const [simLevel, setSimLevel] = useState(65);
   const [simStatus, setSimStatus] = useState("on");
 
-  // Dynamic status check based on simulated level and status
-  const getSimColor = (level: number, status: string) => {
-    if (status !== "on") {
-      return isDarkMode
-        ? "bg-slate-900 border-slate-800 text-slate-500"
-        : "bg-slate-100 border-slate-200 text-slate-500";
-    }
-    if (level >= 90) {
-      return isDarkMode
-        ? "bg-red-500/10 border-red-500/30 text-red-400"
-        : "bg-red-50 border-red-200 text-red-650";
-    }
-    if (level >= 70) {
-      return isDarkMode
-        ? "bg-orange-500/10 border-orange-500/30 text-orange-400"
-        : "bg-orange-50 border-orange-200 text-orange-650";
-    }
-    if (level > 0) {
-      return isDarkMode
-        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-        : "bg-emerald-50 border-emerald-250 text-emerald-700";
-    }
-    return isDarkMode
-      ? "bg-slate-900 border-slate-800 text-slate-550"
-      : "bg-slate-100 border-slate-200 text-slate-500";
-  };
-
   const getSimLabel = (level: number, status: string) => {
     if (status !== "on") return "Offline";
     if (level >= 90) return "Penuh";
     if (level >= 70) return "Hampir Penuh";
     if (level > 0) return "Terisi";
     return "Kosong";
-  };
-
-  const handleSimIncrement = () => {
-    setSimLevel((prev) => Math.min(prev + 15, 100));
-  };
-
-  const handleSimDecrement = () => {
-    setSimLevel((prev) => Math.max(prev - 15, 0));
   };
 
   const toggleSimStatus = () => {
