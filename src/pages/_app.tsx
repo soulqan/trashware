@@ -11,7 +11,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
-  const disableLayout = ["/auth/login", "/auth/register"];
+  const disableLayout = ["/", "/auth/login", "/auth/register"];
   const isDisable = disableLayout.includes(router.pathname);
 
   return (

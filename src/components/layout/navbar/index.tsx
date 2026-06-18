@@ -39,7 +39,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
       {/* Menu Button - Mobile Only */}
       <div className="flex sm:hidden shrink-0">
         <button
-          onClick={onMenuClick || (() => {})}
+          onClick={onMenuClick || (() => { })}
           className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:bg-gray-50"
           aria-label="Buka menu"
         >
@@ -93,7 +93,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             </span>
           )}
         </button>
-        
+
         {/* User Profile */}
         <div className="flex items-center gap-1.5 border-l pl-2 sm:gap-3 sm:pl-6 border-gray-200">
           <button onClick={() => router.push("/profile")} className="flex items-center gap-3 hover:opacity-80 transition">
@@ -105,7 +105,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               <Image src={session.user.image} alt="avatar" width={40} height={40} className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm sm:h-10 sm:w-10" />
             ) : (
               <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-xs border-2 border-white shadow-sm sm:h-10 sm:w-10 sm:text-sm">
-                {(session?.user?.name || "").split(" ").map((n: string) => n[0]).slice(0,2).join("")}
+                {(session?.user?.name || "").split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
               </div>
             )}
           </button>
